@@ -263,6 +263,68 @@ E:\MyProject\418CRMprogram\
   - player:lead_basic(9) + lead_aggregation(3) + lead_time(2) + follow_record(4) + order_summary(5) + extension.*(动态)
   - order:order_core(11) + order_time(4) + lead_joined(7) + order_meta(4) + raw_payload.*(动态)
 
+### 6.11 follow 端实时通知(P12 订单 / 玩家激活)
+
+需求 3:follow 端特殊实时提醒 —— 付费订单入库即时推 + 充值 ≥ 阈值的高额订单独立 event。
+
+**后端**
+- `system_configs` 加 2 个 key(常量在 `model/system_config.go`):
+  - `realtime.high_value_amount` 默认 `100`(元,`>=` 视为高额)
+  - `realtime.enabled` 默认 `true`(`"false"` 一键停推所有 realtime 推送,异常时紧急开关)
+- 启动 `service.EnsureRealtimeDefaults(db)` 写默认值;`service.LoadRealtimeConfig(db)` 每次 webhook 实时读(改完下次推送立即生效,不需要重启进程)
+- `webhook.go` 在 status=paid 订单入库(`isNew`)后:
+  - 推 `order.paid` 或 `order.high_value`(按阈值二选一)到 `follow:realtime` channel
+  - 可选字段 `player_last_active_at`(RFC3339):携带则调 `service.UpdateLeadActiveTime` 更新活跃时间 + 若 is_lost 则自动 mark-active
+- `ws.Hub.BroadcastToFollowRoles(channel, msgType, event, data)`:循环调 `BroadcastToRole` 3 次(`b_manager` / `b_lead` / `b_staff`);**admin 不收**(他走 web 端全局订单列表)
+- WS 连接时 follow 角色自动订阅 channel `follow:realtime`(在 `api/lead.go` 的 wsConnect 里按 `isFollowRole(claims.Role)` 加)
+- `POST /api/v1/players/:player_id/active` 单独端点(任意登录用户可调):
+  - Body:`{ game_id 必填, event_time 可选, source 'manual'|'webhook'|'api' }`
+  - 行为:`UpdateLeadActiveTime` + 推 `player.react` 事件到 follow 角色(供手动标记 / 合作方推)
+- API:`GET|PUT /api/v1/system/configs/realtime`(GET 任意登录用户可读,PUT 仅 admin)
+- 文件:`backend/internal/model/system_config.go`、`backend/internal/service/realtime.go`、`backend/internal/ws/hub.go`、`backend/internal/api/{webhook,follow_active,system_config,router}.go`
+
+**前端**
+- `stores/ws.ts`:`RealtimeNotification[]` 队列(上限 20)+ `unreadCount` + localStorage 持久化(key `realtime_notifications_v1`)+ `markAllRead` / `clearAll`;`pushRealtimeNotification` 收到 `follow:realtime` 事件时构造通知项 + 触发 `fireTauriSystemNotification`(见 6.12)
+- `components/NotificationBell.vue`:n-badge 数字(>0 才显示)+ 下拉面板(标题 / 正文 / 相对时间)+ 高额项左边框(`border-left: 3px solid #f59e0b`);未读项淡蓝底;点击跳对应详情页
+- `MainLayout.vue`:`order.high_value` → 8s 黄色 warning toast;`player.react && was_lost` → 6s 绿色 success toast;两个 toast 点击都跳详情
+- `LeadDetail.vue`:watch `wsStore.lastMessage`,命中当前 lead 时自动 `loadDetail()`(不重复弹 toast)
+- ⚠️ follow 端详情路由是 `/leads/:id`(不是 `/lead/:id`),通知项的 `link` 字段要写对
+- 文件:`desktop-follow/src/stores/ws.ts`、`desktop-follow/src/components/NotificationBell.vue`、`desktop-follow/src/layouts/MainLayout.vue`、`desktop-follow/src/views/LeadDetail.vue`
+
+**消息 payload 形态**
+```json
+{
+  "type": "alert", "channel": "follow:realtime", "event": "order.high_value",
+  "data": {
+    "order_id": 37, "order_no": "WH-RT-005", "amount": 250,
+    "player_id": "wh_test_player_b", "game_id": 4, "game_code": "TEST",
+    "lead_id": 9, "claimed_by": null, "claimed_by_name": null,
+    "high_value": true, "high_value_threshold": 100
+  }
+}
+```
+
+### 6.12 follow 端 Tauri 系统通知(P12.5 任务栏闪 + 系统 toast)
+
+需求:像微信 / QQ 一样 —— 任务栏窗口变黄、图标闪、弹系统 toast。**仅 Tauri 桌面端生效**(crm-desktop-follow.exe);浏览器 / 纯 WebView 走 6.11 的顶部铃铛即可,不申请 Web Notification 授权。
+
+**Tauri Rust**(`desktop-follow/src-tauri/`)
+- `Cargo.toml` 加 `tauri-plugin-notification = "2"` + 平台限定 `windows-sys = { version = "0.59", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }`
+- `run()` 里 `.plugin(tauri_plugin_notification::init())`
+- command `flash_window(window: WebviewWindow, on: bool)`:
+  - Win32 `FlashWindowEx` + `FLASHW_TRAY | FLASHW_TIMERNOFG`(闪任务栏,且即使窗口已获焦也继续闪)
+  - `uCount = 0` → 由系统控制闪烁直到窗口前台化
+- command `show_toast(app, title, body)`:`app.notification().builder().title().body().show()`(Win10/11 走 Action Center)
+- `capabilities/default.json` 加 `"notification:default"` 权限
+- 文件:`Cargo.toml`、`src/lib.rs`、`capabilities/default.json`
+
+**前端(JS)**(在 `stores/ws.ts` 的 `fireTauriSystemNotification`)
+- `isTauri()`:`typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__`
+- 收到 realtime 事件 → `invoke('flash_window', { on: true })` + `invoke('plugin:notification|notify', { options: { title, body } })`
+- 10 秒后自动 `invoke('flash_window', { on: false })` 强制停止(防止窗口离开前台时无限闪)
+
+**触发范围**:`order.paid` / `order.high_value` / `player.react` **全事件都闪 + toast**(用户 2026-10-04 拍板;若后续觉得吵,收敛到仅 `order.high_value` 即可,改 `pushRealtimeNotification` 的调用点)
+
 ---
 
 ## 7. 踩过的坑(下次别再栽)
@@ -291,6 +353,26 @@ DB 默认 `crm_password`(跟 docker-compose 默认对齐)。改 docker-compose �
 
 ### 7.7 菜单权限
 `web/src/router/index.ts` 有 `adminOnly` meta 守卫。**新菜单如果只给管理员**,用 child 标签包。
+
+### 7.8 E: 盘 NTFS 单 inode 偶发损坏(os error 433)
+
+症状:`Get-FileHash` / `[IO.File]::ReadAllBytes` / cargo 写 .rlib 报 `A device which does not exist was specified`(os error 433),但同目录其他文件读写完全正常。
+
+- 2026-10-04 / 10-05 在 `desktop-follow/src-tauri/target/debug/.fingerprint/deranged-*` 和 `crm-desktop-follow.exe` 上都遇到
+- **重命名修复不了** —— 损坏的是 inode/MFT 记录本身,rename 后 inode 跟着走,换个新名字指向同一条坏记录照样写不进
+- 删除重建后写入正常(cargo 会自己重算 fingerprint);但如果是已存在的文件(exe)删了重拷可能仍读到坏记录
+- `git init` 提交后这个项目在 GitHub 上有完整副本,极端情况可 `git clone` 恢复
+- **应对**:cargo 一直报同一个 crate 的同一个 fingerprint 路径失败 → 别死磕清理,直接把 `src-tauri` 拷到别的盘(如 `D:\crm-follow-build`)`cargo build`,产物 exe 从那边启动
+- 这不是代码问题,也不是某个 crate 的问题(desk-lead 的 E: target 也偶发),纯属 E: 盘 NTFS 偶发损坏
+
+### 7.9 git 仓库已初始化(2026-10-13)
+
+- remote:`git@github.com:Bancel3159/418CRMprogram.git`(SSH,认证身份 `Bancel3159`)
+- 本仓库 `user.name` / `user.email` 已设成 `Bancel3159` / `315985660@qq.com`(覆盖全局的 `JD Tool Dev`)
+- 首推 commit:`74949ca` / 218 files / 60239 行
+- `.gitignore` 已挡住:`.env`(根 + backend)、`backend/bin/`、`node_modules/`、`dist/`、`src-tauri/target/`、`*.log`、`.dev-logs/`、`backend/uploads/`、根目录调试残留(`drawer_check.txt` / `players*.json` / `players_check.txt`)
+- 入库的 `.env` 只有 `backend/.env.example`(模板,无真实密钥)
+- 克隆后要跑起来:`cp backend/.env.example backend/.env` → 改 `CRM_JWT_SECRET` / `CRM_TURNSTILE_SECRET`
 
 ---
 
@@ -359,4 +441,4 @@ docker exec crm-postgres psql -U crm -d crm_db -c "\dt"
 
 ---
 
-**最后更新**:2026-10-02 · 反映本轮所有决策(人设库下线、上下级权限、DWM 圆角、菜单重组、合作方内联、字典简化)。
+**最后更新**:2026-10-13 · P12 实时通知(6.11)+ Tauri 系统通知(6.12)+ git 仓库初始化(7.9)+ E: 盘 inode 踩坑(7.8)。

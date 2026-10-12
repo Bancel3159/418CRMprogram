@@ -1,0 +1,35 @@
+[package]
+name = "crm-desktop-lead"
+version = "0.1.0"
+description = "CRM Desktop - Lead Client"
+authors = ["CRM Team"]
+edition = "2021"
+
+[lib]
+name = "crm_desktop_lead_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-fs = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-global-shortcut = "2"
+global-hotkey = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4"
+once_cell = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Graphics_Dwm"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

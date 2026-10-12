@@ -1,0 +1,131 @@
+/* ==========================================================================
+ *  设计 token:圆角 / 阴影 / 色彩 / 间距
+ *  所有 vue 页面通过这套 token 保持视觉一致性,统一蓝色调。
+ * ========================================================================== */
+
+:root {
+  /* 蓝色主题色 */
+  --c-blue-50:  #eff6ff;
+  --c-blue-100: #dbeafe;
+  --c-blue-200: #bfdbfe;
+  --c-blue-500: #3b82f6;
+  --c-blue-600: #2563eb;
+  --c-blue-700: #1d4ed8;
+  --c-blue-800: #1e3a8a;
+
+  /* 中性色 */
+  --c-ink-900: #0f172a; /* 主文字 */
+  --c-ink-700: #334155;
+  --c-ink-600: #475569;
+  --c-ink-500: #64748b;
+  --c-ink-400: #94a3b8;
+  --c-ink-300: #cbd5e1;
+  --c-ink-200: #e2e8f0;
+  --c-ink-100: #f1f5f9;
+  --c-ink-50:  #f8fafc;
+
+  /* 状态色 */
+  --c-amber: #f59e0b;
+  --c-amber-soft: #fef3c7;
+  --c-green: #10b981;
+  --c-red:   #ef4444;
+  --c-red-soft: #fee2e2;
+
+  /* 圆角等级(全站统一,只在确有必要时用大值) */
+  --r-xs: 6px;   /* 极小元素:kbd / chip */
+  --r-sm: 8px;   /* 小元素:tag / 标签 */
+  --r-md: 10px;  /* 中等:输入框 / 按钮 / KPI 卡 */
+  --r-lg: 14px;  /* 卡片:section / 容器 */
+  --r-xl: 18px;  /* 大容器:登录卡 / 弹窗 */
+
+  /* 阴影等级(全部偏蓝调,与整体风格统一) */
+  --shadow-xs: 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-sm: 0 1px 0 rgba(37,99,235,0.04), 0 2px 6px rgba(37,99,235,0.06);
+  --shadow-md: 0 4px 12px rgba(37,99,235,0.12);
+  --shadow-lg: 0 10px 28px rgba(37,99,235,0.18);
+  --shadow-xl: 0 18px 40px rgba(37,99,235,0.22);
+
+  /* 通用 */
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap-md: 12px;
+  --gap-lg: 18px;
+  --gap-xl: 24px;
+}
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--c-ink-50);
+}
+
+/* 全局按钮、输入、选择的圆角统一 */
+.n-input,
+.n-select,
+.n-input-number,
+.n-input-textarea,
+.n-date-picker,
+.n-upload .n-upload-dragger,
+.n-button:not(.n-button--text-type) {
+  border-radius: var(--r-md) !important;
+}
+
+/* ===== 通用页面模板 ===== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 var(--gap-md) 0;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--c-ink-900);
+}
+
+/* ===== 通用卡片 ===== */
+.card-section {
+  background: #ffffff;
+  border-radius: var(--r-lg);
+  padding: 16px;
+  margin-bottom: var(--gap-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+.card-section:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* 带强调色左边竖线 */
+.card-accent-blue   { border-left: 3px solid var(--c-blue-600); }
+.card-accent-amber  { border-left: 3px solid var(--c-amber); }
+.card-accent-gray   { border-left: 3px solid var(--c-ink-300); }
+
+.text-muted { color: var(--c-ink-500); }
+
+/* 主按钮(蓝色填充)加入阴影以便与卡片区分 */
+.n-button--primary-type:not(.n-button--text-type):not(:disabled) {
+  box-shadow: 0 4px 12px rgba(37,99,235,0.22);
+}
+.n-button--primary-type:not(.n-button--text-type):not(:disabled):hover {
+  box-shadow: 0 6px 16px rgba(37,99,235,0.30);
+  transform: translateY(-1px);
+}
+
+/* 等宽字体块 - 用于代码/快捷键展示 */
+.kbd {
+  display: inline-block;
+  font-family: "SF Mono", Consolas, "Microsoft YaHei", monospace;
+  font-size: 12px;
+  background: var(--c-ink-100);
+  border: 1px solid var(--c-ink-200);
+  border-bottom-width: 2px;
+  border-radius: var(--r-xs);
+  padding: 3px 9px;
+  color: var(--c-blue-800);
+  letter-spacing: 1px;
+}

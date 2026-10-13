@@ -192,15 +192,15 @@ func (r *Router) playerList(c *gin.Context) {
 			(SELECT id FROM leads_filtered lf
 			   WHERE lf.player_id = l.player_id AND lf.game_id = l.game_id
 			   ORDER BY lf.created_at DESC LIMIT 1) AS latest_lead_id,
-			(SELECT player_username FROM leads_filtered lf
+			COALESCE((SELECT player_username FROM leads_filtered lf
 			   WHERE lf.player_id = l.player_id AND lf.game_id = l.game_id
-			   ORDER BY lf.created_at DESC LIMIT 1) AS latest_username,
-			(SELECT player_country FROM leads_filtered lf
+			   ORDER BY lf.created_at DESC LIMIT 1), '') AS latest_username,
+			COALESCE((SELECT player_country FROM leads_filtered lf
 			   WHERE lf.player_id = l.player_id AND lf.game_id = l.game_id
-			   ORDER BY lf.created_at DESC LIMIT 1) AS latest_country,
-			(SELECT is_target FROM leads_filtered lf
+			   ORDER BY lf.created_at DESC LIMIT 1), '') AS latest_country,
+			COALESCE((SELECT is_target FROM leads_filtered lf
 			   WHERE lf.player_id = l.player_id AND lf.game_id = l.game_id
-			   ORDER BY lf.created_at DESC LIMIT 1) AS latest_is_target,
+			   ORDER BY lf.created_at DESC LIMIT 1), '') AS latest_is_target,
 			COUNT(*) AS lead_count,
 			MIN(l.created_at) AS first_lead_at,
 			MAX(l.created_at) AS last_lead_at,

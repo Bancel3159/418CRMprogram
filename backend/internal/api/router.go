@@ -93,6 +93,8 @@ func (r *Router) setupRoutes() {
 			authorized.POST("/leads/:id/follow", r.leadCreateFollow)
 			authorized.POST("/leads/:id/mark-lost", r.leadMarkLostManual)
 			authorized.POST("/leads/:id/mark-active", r.leadMarkActiveManual)
+			// P13 全字段强制编辑(admin only,玩家流转 / 数据调整)
+			authorized.PUT("/leads/:id/force-edit", middleware.RequireAdmin(), r.forceEditLead)
 			// P11 系统配置(follow)
 			authorized.GET("/system/configs/follow", r.systemConfigFollowGet)
 			authorized.PUT("/system/configs/follow", r.systemConfigFollowUpdate)

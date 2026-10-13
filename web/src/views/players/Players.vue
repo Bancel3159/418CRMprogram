@@ -32,14 +32,26 @@
       :player-id="drawerPlayerId"
       :game-id="drawerGameId"
     />
+
+    <!-- P13 全字段强制编辑(admin only) -->
+    <PlayerEditDrawer
+      v-model:show="editShow"
+      :lead-id="editLeadId"
+      @saved="loadList"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, h, computed } from 'vue'
-import { NDataTable, NButton, NSpace, NInput, NSelect, NTag, type DataTableColumns } from 'naive-ui'
+import { NDataTable, NButton, NSpace, NInput, NSelect, NTag, NTooltip, useMessage, type DataTableColumns } from 'naive-ui'
 import { playerApi, gameApi, listViewApi, type PlayerSummary, type ListViewField } from '@/api/modules'
+import { useUserStore } from '@/stores/user'
 import PlayerDrawer from './PlayerDrawer.vue'
+import PlayerEditDrawer from './PlayerEditDrawer.vue'
+
+const userStore = useUserStore()
+const message = useMessage()
 
 const players = ref<PlayerSummary[]>([])
 const loadingList = ref(false)
@@ -67,10 +79,25 @@ const drawerShow = ref(false)
 const drawerPlayerId = ref('')
 const drawerGameId = ref(0)
 
+// P13 强制编辑抽屉
+const editShow = ref(false)
+const editLeadId = ref<number | null>(null)
+
 function openDrawer(row: PlayerSummary) {
   drawerPlayerId.value = row.player_id
   drawerGameId.value = row.game_id
   drawerShow.value = true
+}
+
+// 打开强制编辑:用该 player 的最新 lead(列表已返回 latest_lead_id)
+function openEdit(row: PlayerSummary) {
+  const leadId = (row as any).latest_lead_id
+  if (!leadId) {
+    message.warning('该玩家没有可编辑的 lead')
+    return
+  }
+  editLeadId.value = leadId
+  editShow.value = true
 }
 
 // ===== 视图配置加载 + 列动态构建 =====
@@ -88,13 +115,40 @@ async function loadDefaultView() {
 
 // 列动态构建
 const dynamicColumns = computed<DataTableColumns<PlayerSummary>>(() => {
-  return viewFields.value.map((f) => ({
+  const cols = viewFields.value.map((f) => ({
     title: f.label,
     key: f.code,
     width: f.width || undefined,
     align: (f.align as any) || 'left',
     render: renderCellFor(f)
   }))
+
+  // P13 操作列(admin only)— 固定在最后
+  if (userStore.isAdmin) {
+    cols.push({
+      title: '操作',
+      key: '__actions',
+      width: 110,
+      fixed: 'right',
+      align: 'center',
+      render: (row: PlayerSummary) =>
+        h(
+          NTooltip,
+          {},
+          {
+            default: () => 'P13 全字段强制编辑(绕过业务校验,写审计日志)',
+            trigger: () =>
+              h(
+                NButton,
+                { size: 'small', type: 'warning', secondary: true, onClick: (e: MouseEvent) => { e.stopPropagation(); openEdit(row) } },
+                () => '编辑'
+              )
+          }
+        )
+    })
+  }
+
+  return cols
 })
 
 function renderCellFor(f: ListViewField) {

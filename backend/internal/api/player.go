@@ -24,6 +24,7 @@ type PlayerSummary struct {
 	GameID         uint       `json:"game_id"`
 	GameCode       string     `json:"game_code,omitempty"`
 	GameName       string     `json:"game_name,omitempty"`
+	LatestLeadID   uint       `json:"latest_lead_id"`   // P13 强制编辑入口用(最新 lead 的 id)
 	LatestUsername string     `json:"latest_username"`
 	LatestCountry  string     `json:"latest_country"`
 	LatestIsTarget string     `json:"latest_is_target"`
@@ -254,6 +255,7 @@ func (r *Router) playerList(c *gin.Context) {
 		if ra.LeadIDs != "" {
 			p.LeadIDs = parsePgIntArray(ra.LeadIDs)
 		}
+		p.LatestLeadID = ra.LatestLeadID
 		if len(ra.Extension) > 0 {
 			extStr := strings.Trim(string(ra.Extension), `"`)
 			extStr = strings.ReplaceAll(extStr, `\"`, `"`)
@@ -406,6 +408,10 @@ func (r *Router) playerDetail(c *gin.Context) {
 			claimedSet[*l.ClaimedBy] = true
 		}
 		summary.LeadIDs = append(summary.LeadIDs, l.ID)
+	}
+	// P13 强制编辑入口:leads 已按 created_at DESC 排序,索引 0 即最新
+	if len(leads) > 0 {
+		summary.LatestLeadID = leads[0].ID
 	}
 	for k := range creatorSet {
 		summary.CreatorIDs = append(summary.CreatorIDs, k)

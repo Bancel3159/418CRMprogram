@@ -177,7 +177,9 @@ export const leadApi = {
   delete: (id: number) => http.delete<any, any>(`/leads/${id}`),
   claim: (id: number) => http.post<any, any>(`/leads/${id}/claim`),
   release: (id: number) => http.post<any, any>(`/leads/${id}/release`),
-  archive: (id: number) => http.post<any, any>(`/leads/${id}/archive`)
+  archive: (id: number) => http.post<any, any>(`/leads/${id}/archive`),
+  // P13 全字段强制编辑(admin only)— 玩家流转 / 数据调整
+  forceEdit: (id: number, data: any) => http.put<any, any>(`/leads/${id}/force-edit`, data)
 }
 
 // ============ 文件上传 ============
@@ -351,6 +353,7 @@ export interface PlayerSummary {
   game_id: number
   game_code?: string
   game_name?: string
+  latest_lead_id?: number   // P13 强制编辑入口用
   latest_username: string
   latest_country: string
   latest_is_target: string

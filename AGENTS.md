@@ -325,6 +325,31 @@ E:\MyProject\418CRMprogram\
 
 **触发范围**:`order.paid` / `order.high_value` / `player.react` **全事件都闪 + toast**(用户 2026-10-04 拍板;若后续觉得吵,收敛到仅 `order.high_value` 即可,改 `pushRealtimeNotification` 的调用点)
 
+### 6.13 玩家全字段强制编辑(P13 玩家流转 / 数据调整)
+
+需求:后期要流转玩家或调整数据时,需要能改**所有字段**,包括常规业务流程不允许动的那些(改游戏、改拉新员、改维护员、改状态机、改付费标记、改流失状态)。
+
+**核心决策**
+- **入口**:web 端玩家列表新增「操作」列(固定右侧),仅 admin 可见(`userStore.isAdmin`)
+- **定位方式**:`player_id` 是唯一主键(同一玩家进不同游戏 ID 也不同),列表接口返回 `latest_lead_id`,前端直接用它打开编辑弹窗
+- **权限**:路由级 `middleware.RequireAdmin()`,非 admin 调接口直接 403
+- **审计**:每次编辑写 `audit_logs`(action=`update`, target_type=`lead`, extension 里带 `force_edit: true` + `changed_fields` 精确 diff)
+
+**后端**(`backend/internal/api/lead_force_edit.go`)
+- `PUT /api/v1/leads/:id/force-edit`
+- `ForceEditReq` 所有字段都是 `*T` 指针 —— **nil = 本次不改**,这样能区分「不改」和「改成零值」
+- **开放**:game_id / creator_id / claimed_by / released_by / channel / status / player_id / player_username / player_game_name / region / player_country / player_age / is_target / community / token_code / screenshots / remark / extension / paid_mark / is_lost / lost_reason / reactivated_at / last_player_active_at / 各 `_at` 时间字段
+- **不开放**:created_at / updated_at / deleted_at / paid_auto / is_paid(系统生成)
+- **仍保留的基本校验**(防止脏数据):游戏必须存在、status/is_target 枚举合法、player_age 0-150
+- `diffLeadFields(before, after)` 逐字段比对,只把**真正变化的**字段名写进审计
+- **派生字段约定**:`lost_at` 和 `paid_marked_at` 由后端自动维护(`is_lost` 变 true 时写 now;`paid_mark` 变更时写 now/置 NULL),**不进 diff 列表**
+
+**前端**
+- `web/src/views/players/PlayerEditDrawer.vue`:720px 右侧抽屉,分 4 组(归属与流转 / 核心业务字段 / 付费与流失状态 / 扩展字段 JSON),底部实时显示「本次将修改的字段 (N)」tag,提交前弹二次确认
+- `web/src/views/players/Players.vue`:`dynamicColumns` computed 里判断 `userStore.isAdmin` 才 push 操作列
+- `web/src/api/modules.ts`:`leadApi.forceEdit(id, data)`
+- ⚠️ **前端 diff 必须排除派生字段**:表单里没有 `lost_at` / `paid_marked_at` 的输入控件,如果直接按字段名遍历比较,会因为 `undefined` != 原值而误报成「已修改」,导致按钮显示"保存修改(2)"但实际提交 0 个字段。用 `DERIVED_FIELDS` Set 显式排除
+
 ---
 
 ## 7. 踩过的坑(下次别再栽)
@@ -468,4 +493,4 @@ docker exec crm-postgres psql -U crm -d crm_db -c "\dt"
 
 ---
 
-**最后更新**:2026-10-13 · P12 实时通知(6.11)+ Tauri 系统通知(6.12)+ git 仓库初始化(7.9)+ E: 盘 inode 踩坑(7.8)。
+**最后更新**:2026-10-13 · P13 玩家全字段强制编辑(6.13)+ P12 实时通知(6.11/6.12)+ git 仓库初始化(7.9)+ 端口迁移 517x→527x(7.1.1)。

@@ -48,12 +48,12 @@ function Stop-Occupying($port) {
   Write-Step ("Cleaning port " + $port)
   $conns = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
   foreach ($c in $conns) {
-    $pid = $c.OwningProcess
+    $procId = $c.OwningProcess   # 不要用 $pid(PowerShell 保留变量,只读)
     try {
-      $p = Get-Process -Id $pid -ErrorAction SilentlyContinue
+      $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
       if ($p) {
-        Write-Host ("  - killing PID " + $pid + " (" + $p.ProcessName + ")") -ForegroundColor DarkYellow
-        Stop-Process -Id $pid -Force
+        Write-Host ("  - killing PID " + $procId + " (" + $p.ProcessName + ")") -ForegroundColor DarkYellow
+        Stop-Process -Id $procId -Force
       }
     } catch {}
   }
@@ -111,14 +111,9 @@ Start-Sleep -Seconds 2
 Get-Process -Name $ExeName -ErrorAction SilentlyContinue | Format-Table Id,ProcessName -AutoSize | Out-String | Write-Host
 
 Write-Host ""
-Write-Host "[OK] started. Press Ctrl+C in this window to stop the watcher." -ForegroundColor Green
-Write-Host "Children stay alive even after this script exits." -ForegroundColor DarkGray
+Write-Host "[OK] started." -ForegroundColor Green
+Write-Host "  Vite  : http://localhost:$VitePort" -ForegroundColor DarkGray
+Write-Host "  Tauri : $ExePath" -ForegroundColor DarkGray
+Write-Host "Children are detached - this script exits immediately, they keep running." -ForegroundColor DarkGray
 Write-Host "Use scripts\dev-stop.ps1 to stop them manually." -ForegroundColor DarkGray
-
-# Just keep this terminal alive until Ctrl+C; do NOT auto-clean children on exit.
-try {
-  while ($true) { Start-Sleep -Seconds 60 }
-}
-finally {
-  Write-Host "`nWatcher ended. Children still running (use dev-stop.ps1 to kill)." -ForegroundColor Cyan
-}
+exit 0

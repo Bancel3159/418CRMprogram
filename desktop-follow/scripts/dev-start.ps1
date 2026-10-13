@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   One-click dev starter for desktop-follow (CRM 维护端).
 .NOTES
@@ -8,9 +8,9 @@
   - Both children are fully detached: closing this script's terminal does not kill them.
     Use scripts\dev-stop.ps1 to kill them manually.
   - Flow:
-    1. Kill leftovers on port 5175 + crm-desktop-follow.exe
+    1. Kill leftovers on port 5275 + crm-desktop-follow.exe
     2. Background-start pnpm dev (logs in .dev-logs/vite.log)
-    3. Poll localhost:5175 with TCP until 200 (timeout 30s)
+    3. Poll localhost:5275 with TCP until 200 (timeout 30s)
     4. Start src-tauri\target\debug\crm-desktop-follow.exe
   Press Ctrl+C in this window to stop the watcher (children stay alive).
 #>
@@ -19,7 +19,7 @@ $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
-$VitePort   = 5175
+$VitePort   = 5275
 $ExePath    = Join-Path $ProjectRoot 'src-tauri\target\debug\crm-desktop-follow.exe'
 $ExeName    = 'crm-desktop-follow'
 $LogDir     = Join-Path $ProjectRoot '.dev-logs'

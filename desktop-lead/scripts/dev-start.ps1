@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   One-click dev starter for desktop-lead (CRM 拉新端).
 .NOTES
@@ -8,9 +8,9 @@
   - Both children are fully detached: closing this script's terminal does not kill them.
     Use scripts\dev-stop.ps1 to kill them manually.
   - Flow:
-    1. Kill leftovers on port 5174 + crm-desktop-lead.exe
+    1. Kill leftovers on port 5274 + crm-desktop-lead.exe
     2. Background-start pnpm dev (logs in .dev-logs/vite.log)
-    3. Poll localhost:5174 with TCP until 200 (timeout 30s)
+    3. Poll localhost:5274 with TCP until 200 (timeout 30s)
     4. Start src-tauri\target\debug\crm-desktop-lead.exe
   Press Ctrl+C in this window to stop the watcher (children stay alive).
 #>
@@ -19,7 +19,7 @@ $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
-$VitePort   = 5174
+$VitePort   = 5274
 $ExePath    = Join-Path $ProjectRoot 'src-tauri\target\debug\crm-desktop-lead.exe'
 $ExeName    = 'crm-desktop-lead'
 $LogDir     = Join-Path $ProjectRoot '.dev-logs'

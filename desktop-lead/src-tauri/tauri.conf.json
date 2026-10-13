@@ -5,7 +5,7 @@
   "identifier": "com.crm.desktop-lead",
   "build": {
     "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:5174",
+    "devUrl": "http://localhost:5274",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },

@@ -1,21 +1,21 @@
-﻿<#
+<#
 .SYNOPSIS
   One-click dev starter for web admin (CRM 后台管理 web 端).
 .NOTES
-  - 仅起 Vite(port 5173),没有 Tauri exe
+  - 仅起 Vite(port 5273),没有 Tauri exe
   - Vite 启动后保持常驻;关闭本脚本不影响 Vite
   - 需要 backend (:8080) 已先启动 —— Vite 的 /api、/uploads、/ws 代理都指向 :8080
   - Flow:
-    1. Kill leftovers on port 5173
+    1. Kill leftovers on port 5273
     2. Background-start pnpm dev (logs in .dev-logs/vite.log)
-    3. Poll localhost:5173 with TCP until answer(超时 30s)
+    3. Poll localhost:5273 with TCP until answer(超时 30s)
   Press Ctrl+C in this window to stop the watcher (children stay alive).
 #>
 $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $ProjectRoot
 
-$VitePort = 5173
+$VitePort = 5273
 $LogDir   = Join-Path $ProjectRoot '.dev-logs'
 if (-not (Test-Path $LogDir)) { New-Item -ItemType Directory -Path $LogDir | Out-Null }
 

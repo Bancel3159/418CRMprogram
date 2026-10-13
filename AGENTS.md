@@ -63,7 +63,7 @@ E:\MyProject\418CRMprogram\
 │   │   ├── views/system/      # 系统管理页面
 │   │   ├── views/leads/       # 线索管理
 │   │   └── styles/            # design tokens
-│   ├── scripts/dev-start.ps1  # hidden 窗口启 Vite :5173
+│   ├── scripts/dev-start.ps1  # hidden 窗口启 Vite :5273
 │   └── scripts/dev-stop.ps1
 ├── desktop-lead/              # 拉新端
 │   ├── src/                   # Vue 前端
@@ -113,10 +113,10 @@ E:\MyProject\418CRMprogram\
 | PostgreSQL | 5432 | Docker `crm-postgres`(由 docker-compose) |
 | Redis | 6379 | Docker `crm-redis` |
 | Go 后端 | **8080** | `backend/scripts/dev-start.ps1`(`bin/server.exe`,改 Go 源码需先 `cargo build` … 哦不,Go 直接 `go build -o bin/server.exe ./cmd/server` 即可) |
-| Web 端(Vite) | **5173** | `web/scripts/dev-start.ps1` |
-| desktop-lead(Vite) | **5174** | `desktop-lead/scripts/dev-start.ps1` |
+| Web 端(Vite) | **5273** | `web/scripts/dev-start.ps1`(原 5173,见 7.1.1) |
+| desktop-lead(Vite) | **5274** | `desktop-lead/scripts/dev-start.ps1`(原 5174) |
 | desktop-lead(Tauri 窗) | — | dev-start 内部启动 `target/debug/crm-desktop-lead.exe` |
-| desktop-follow(Vite) | **5175** | `desktop-follow/scripts/dev-start.ps1` |
+| desktop-follow(Vite) | **5275** | `desktop-follow/scripts/dev-start.ps1`(原 5175) |
 | desktop-follow(Tauri 窗) | — | 同上 |
 
 **当前 Docker 状态**:PG + Redis 已起(`docker-compose up -d`)。Go 服务**不在 Docker 里**,必须本地启。
@@ -330,7 +330,34 @@ E:\MyProject\418CRMprogram\
 ## 7. 踩过的坑(下次别再栽)
 
 ### 7.1 Rust 改动后必须手动 cargo build
-`dev-start.ps1` 启动的是 `pnpm dev` 只起 Vite,**不会**自动 rebuild Rust。Rust 源码改了必须先 `cd src-tauri && cargo build`,然后**重启 Tauri exe**(旧的 exe 锁着,build 替换失败;直接 kill 重启)。
+`dev-start.ps1` 启动的是 `pnpm dev` 只起 Vite,**不会**自动 rebuild Rust。Rust 源码改了必须先 `cd src-tauri && cargo build`,然后**重启 Tauri exe**(旧的 exe 锁着,build 会报 `os error 5 拒绝访问`,要先 Stop-Process 再 build)。
+
+**⚠️ 改 `tauri.conf.json` 的 `devUrl` 同样必须重新 `cargo build`** —— `devUrl` 是编译期被 `tauri::generate_context!()` 烧进 exe 的常量,不是运行时读文件。改完配置不编译 → Tauri 窗口去连旧端口 → 显示「localhost 拒绝连接」。
+- 对照:`vite.config.ts` 的 `port` 是 Vite **运行时**读,HMR 直接生效,不用编译
+- 2026-10-13 踩过:Vite 从 5175 迁到 5275(Windows 排除端口范围 5041-5240 吞了 5173-5175),改了 conf 但没编译,两端窗口全白屏报拒绝连接
+- 验证手段:`[IO.File]::ReadAllBytes(exe)` 然后 `Select-String 'localhost:\d{4}'`,能直接看到烧进去的端口
+
+### 7.1.1 当前端口(2026-10-13 起)
+
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| PostgreSQL | 5432 | Docker crm-postgres |
+| Redis | 6379 | Docker crm-redis |
+| Go 后端 | **8080** | `backend/scripts/dev-start.ps1` |
+| web 主管后台 | **5273** | 原 5173 |
+| desktop-lead 拉新端 | **5274** | 原 5174 |
+| desktop-follow 维护端 | **5275** | 原 5175 |
+
+**为什么从 517x 迁到 527x**:Windows 排除端口范围(Hyper-V / WSL / Docker Desktop 自动保留)`5041-5240` 把 5173/5174/5175 全吞了,Vite bind `0.0.0.0` 时报 `EACCES: permission denied`。
+- 查命令:`netsh interface ipv4 show excludedportrange protocol=tcp`
+- 不要试图改这个系统设置(要管理员权限且影响全局),直接换端口段
+- 改了端口要同步 4 处:`{web,desktop-lead,desktop-follow}/vite.config.ts` + 三个 `scripts/dev-start.ps1` 的 `$VitePort` + `{desktop-lead,desktop-follow}/src-tauri/tauri.conf.json` 的 `devUrl`(后者还要 cargo build)
+
+### 7.1.2 dev-start.ps1 三个坑(2026-10-13 修)
+
+1. **不要用 `$pid`** —— PowerShell 保留变量(只读)。`Stop-Occupying()` 里 `$pid = $c.OwningProcess` 直接抛 `VariableNotWritable`,脚本在「Cleaning port」这步就崩,端口没清、Vite 也没重启。用 `$procId`。
+2. **末尾不要放 `while ($true) { Start-Sleep 60 }`** —— 前台跑终端不返回、没有 `[OK]` 提示,看起来像卡死。子进程本就是 `-WindowStyle Hidden` detached,脚本 `exit 0` 即可。
+3. **写 .ps1 里的中文/特殊符号** —— PowerShell 默认 GBK,em dash(`—`)会显示成 `鈥?`。文件头加 UTF-8 BOM 或直接用 ASCII 字符。
 
 ### 7.2 PowerShell `$pid` 是保留变量
 `$pid` 是当前进程 PID,**不能赋值**。需要拿 owning PID 时用 `$procId` 之类自定义名。

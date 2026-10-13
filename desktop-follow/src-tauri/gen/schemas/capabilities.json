@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"默认权限","local":true,"windows":["main"],"permissions":["core:default","core:window:default","core:webview:default","core:event:default","core:app:default","clipboard-manager:default"]}}
+{"default":{"identifier":"default","description":"默认权限","local":true,"windows":["main"],"permissions":["core:default","core:window:default","core:webview:default","core:event:default","core:app:default","clipboard-manager:default","notification:default"]}}

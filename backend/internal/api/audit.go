@@ -133,5 +133,60 @@ func (r *Router) auditStats(c *gin.Context) {
 	})
 }
 
+// auditWriteStats 数据变更审计统计(近 7 天,按写操作聚合)
+//
+// 与 auditStats 的区别:auditStats 是「全部动作」分布(含大量 login),
+// 这个只统计数据写操作,并额外拆出 force_edit(P13 强制编辑)维度。
+// 给「系统日志 → 数据变更审计」tab 的统计卡用。
+func (r *Router) auditWriteStats(c *gin.Context) {
+	const writeActions = "'create','update','delete','order_import','order_webhook','partner_pull','password_reset','order_bind'"
+
+	var total int64
+	r.DB.Model(&model.AuditLog{}).
+		Where("created_at >= NOW() - INTERVAL '7 days'").
+		Where("action IN (" + writeActions + ")").
+		Count(&total)
+
+	// 强制编辑:update 动作 + extension 里 force_edit = true
+	var forceEdit int64
+	r.DB.Model(&model.AuditLog{}).
+		Where("created_at >= NOW() - INTERVAL '7 days'").
+		Where("action = ?", model.AuditUpdate).
+		Where("extension->>'force_edit' = 'true'").
+		Count(&forceEdit)
+
+	// 按对象类型拆
+	type TypeCount struct {
+		TargetType string `gorm:"column:target_type" json:"target_type"`
+		Count      int64  `gorm:"column:count" json:"count"`
+	}
+	var byType []TypeCount
+	r.DB.Model(&model.AuditLog{}).
+		Select("target_type, COUNT(*) AS count").
+		Where("created_at >= NOW() - INTERVAL '7 days'").
+		Where("action IN (" + writeActions + ")").
+		Group("target_type").
+		Order("count DESC").
+		Scan(&byType)
+
+	leadCount, orderCount := int64(0), int64(0)
+	for _, t := range byType {
+		switch t.TargetType {
+		case string(model.AuditTargetLead):
+			leadCount = t.Count
+		case string(model.AuditTargetOrder):
+			orderCount = t.Count
+		}
+	}
+
+	response.OK(c, gin.H{
+		"total":        total,
+		"force_edit":   forceEdit,
+		"lead_count":   leadCount,
+		"order_count":  orderCount,
+		"by_target_type": byType,
+	})
+}
+
 // 防止 strings 包未引用
 var _ = strings.TrimSpace

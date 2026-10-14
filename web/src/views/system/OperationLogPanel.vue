@@ -1,12 +1,5 @@
 <template>
   <div>
-    <div class="page-header">
-      <n-space>
-        <n-tag type="info" size="small">仅 admin 可见 · 异步记录 · 不影响业务</n-tag>
-        <n-button @click="loadList" :loading="loading">刷新</n-button>
-      </n-space>
-    </div>
-
     <!-- 统计卡 -->
     <n-grid :cols="4" :x-gap="12" :y-gap="12" style="margin-bottom: 16px">
       <n-gi>
@@ -86,14 +79,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, h, onMounted } from 'vue'
+import { ref, reactive, h, onMounted, watch } from 'vue'
 import { NCard, NDataTable, NButton, NSpace, NTag, NSelect, NInput, NDatePicker, NGrid, NGi, NProgress, useMessage, type DataTableColumns } from 'naive-ui'
 import http from '@/api/client'
+
+const props = defineProps<{ active: boolean }>()
 
 const message = useMessage()
 const logs = ref<any[]>([])
 const loading = ref(false)
-const total = ref(0)
 const dateRange = ref<[number, number] | null>(null)
 
 const filter = reactive({
@@ -153,8 +147,7 @@ const statusOptions = [
 ]
 
 function actionLabel(s: string) {
-  const found = actionOptions.find(o => o.value === s)
-  return found?.label || s
+  return actionOptions.find(o => o.value === s)?.label || s
 }
 
 const columns: DataTableColumns<any> = [
@@ -196,8 +189,7 @@ async function loadList() {
 
     const resp: any = await http.get('/audit/logs', { params })
     logs.value = resp.data?.list || []
-    total.value = resp.data?.total || 0
-    pagination.itemCount = total.value
+    pagination.itemCount = resp.data?.total || 0
   } catch {
     message.error('加载失败')
   } finally {
@@ -211,7 +203,6 @@ async function loadStats() {
     byAction.value = resp.data?.by_action || []
     byUser.value = resp.data?.by_user || []
 
-    // 计算汇总
     const allLogs = byAction.value
     stats.value = {
       total: allLogs.reduce((s: number, r: any) => s + Number(r.count), 0),
@@ -251,27 +242,23 @@ function resetFilter() {
 }
 
 function showDetails(row: any) {
-  // 用 NMessage 显示完整 JSON
   const ext = row.extension || {}
   const before = row.before || {}
   const after = row.after || {}
   const lines: string[] = []
   if (row.error_message) lines.push(`错误: ${row.error_message}`)
-  if (Object.keys(before).length > 0) lines.push(`变更前: ${JSON.stringify(before, null, 0)}`)
-  if (Object.keys(after).length > 0) lines.push(`变更后: ${JSON.stringify(after, null, 0)}`)
-  if (Object.keys(ext).length > 0) lines.push(`扩展: ${JSON.stringify(ext, null, 0)}`)
+  if (Object.keys(before).length > 0) lines.push(`变更前: ${JSON.stringify(before)}`)
+  if (Object.keys(after).length > 0) lines.push(`变更后: ${JSON.stringify(after)}`)
+  if (Object.keys(ext).length > 0) lines.push(`扩展: ${JSON.stringify(ext)}`)
   if (lines.length === 0) lines.push('无附加信息')
   message.info(lines.join('\n'), { duration: 6000 })
 }
 
-onMounted(() => {
-  loadList()
-  loadStats()
-})
+watch(() => props.active, (v) => { if (v) { loadList(); loadStats() } })
+onMounted(() => { loadList(); loadStats() })
 </script>
 
 <style scoped>
-.page-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 16px; }
 .stat-label { color: #999; font-size: 12px; margin-bottom: 4px; }
 .stat-value { font-size: 22px; font-weight: 700; color: #333; }
 .text-muted { color: #999; text-align: center; padding: 20px 0; }

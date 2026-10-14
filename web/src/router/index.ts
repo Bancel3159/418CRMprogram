@@ -92,8 +92,8 @@ const router = createRouter({
         {
           path: 'system/audit',
           name: 'audit',
-          component: () => import('@/views/system/AuditLogs.vue'),
-          meta: { title: '操作日志', adminOnly: true }
+          component: () => import('@/views/system/SystemLogCenter.vue'),
+          meta: { title: '系统日志', adminOnly: true }
         }
       ]
     },

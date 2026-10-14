@@ -240,6 +240,7 @@ func (r *Router) setupRoutes() {
 				audit.GET("/logs", r.auditList)
 				audit.GET("/logs/:id", r.auditGet)
 				audit.GET("/stats", r.auditStats)
+				audit.GET("/write-stats", r.auditWriteStats)
 			}
 
 			// 注册扩展字段(所有登录用户可读,管理操作仅 admin) 

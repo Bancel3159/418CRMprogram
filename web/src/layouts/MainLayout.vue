@@ -91,7 +91,7 @@ const menuOptions = computed<MenuOption[]>(() => {
           key: '/system/games'
         },
         { label: '配置中心', key: '/system/config' },
-        { label: '操作日志', key: '/system/audit' }
+        { label: '系统日志', key: '/system/audit' }
       ]
     }
   ]

@@ -350,6 +350,41 @@ E:\MyProject\418CRMprogram\
 - `web/src/api/modules.ts`:`leadApi.forceEdit(id, data)`
 - ⚠️ **前端 diff 必须排除派生字段**:表单里没有 `lost_at` / `paid_marked_at` 的输入控件,如果直接按字段名遍历比较,会因为 `undefined` != 原值而误报成「已修改」,导致按钮显示"保存修改(2)"但实际提交 0 个字段。用 `DERIVED_FIELDS` Set 显式排除
 
+### 6.14 P14 全链路种子 + 数据通路修复
+
+**背景**:原数据太薄(9 线索 / 30 订单),follow 端准备复用 web 端逻辑时,大量边界分支没被覆盖 —— 每改一个字段就得手工造数据,效率极低。
+
+**新增 `backend/cmd/seed_p14/main.go`**
+- 10 个场景 × 3 个玩家 = 30 线索,覆盖完整生命周期:
+  L1 新注册未认领 / L2 已认领未跟进 / L3 已跟进已付费 / L4 付费即将离线 /
+  L5 付费已离线流失 / L6 流失后重新激活 / **L7 已归档 + 历史订单** /
+  L8 多渠道多区服 / L9 扩展字段有值 / L10 超长文本特殊字符
+- 产出:6 游戏 / 30 线索 / 55 订单 / 27 跟进 / 27 提醒 / 12 流失
+- 账号密码统一 `test123`:`p14_wangguan`(B 主管) / `p14_ningchuan`(B 组长) / `p14_guoyuan`(B 员工);A 部 `p14_xingdong` / `p14_qingtian` / `p14_beike`
+- 用法:`go run ./cmd/seed_p14/`(追加) / `go run ./cmd/seed_p14/ -clean`(先清 P14- 前缀数据再生成)
+- 所有 player_id 带 `P14-` 前缀 —— 方便精准清理,不会误删真实数据
+- 用固定随机种子 `20261018` → 每次生成的数据可复现
+
+**修复的 3 个数据通路断点**
+
+1. **归档 lead 的历史订单永久悬空**(`internal/service/attribution.go`)
+   - 原逻辑只匹配 `status IN (pending, claimed)`,lead 一旦归档,该玩家所有订单再也绑不上去
+   - 后果:收入算不进线索、玩家页订单数显示 0。`VITE_PLAYER_001` 有 12 笔订单全是孤儿
+   - 修:两段式匹配 —— 先试活跃线索,0 命中再退到 `archived`(`Order("id DESC").Limit(1)` 取最新一条)
+   - 效果:P14 种子 55 笔订单**全部归属,待人工 0**
+   - ⚠️ 多条活跃线索命中时仍是 `pending`(历史行为,人工介入),只有 fallback 到 archived 才自动归属
+
+2. **webhook 归属失败告警信息量不足**(`internal/api/webhook.go`)
+   - 原来只有 `pending_attribution` 三个字,看不出是「玩家不在任何 lead 里」还是「命中多条」,也不知道 game_id 是不是传错
+   - 修:告警带上 `player=xxx game=xxx 命中 lead=N 条`
+
+3. **`lead_reminders` 缺软删字段**(`internal/model/lead_reminder.go`)
+   - 注释写着「软删除沿用 gorm.DeletedAt」但字段漏了,误删提醒记录没法恢复
+   - 修:补 `DeletedAt` 字段 + DB `ALTER TABLE`
+   - ⚠️ **`system_configs` 故意不补**:它是配置表不是业务数据,key 是主键,删了 `EnsureDefaultConfigs` 会重填默认值;加软删反而让主键冲突时旧值复活不了,徒增复杂度
+
+**验证方式**:用 B 部账号登录 follow 端,今日待办 / 我的玩家 / 维护看板三个页面都应该有数据(修复前分别是空 / 9 条 / 0)
+
 ---
 
 ## 7. 踩过的坑(下次别再栽)
@@ -493,4 +528,4 @@ docker exec crm-postgres psql -U crm -d crm_db -c "\dt"
 
 ---
 
-**最后更新**:2026-10-13 · P13 玩家全字段强制编辑(6.13)+ P12 实时通知(6.11/6.12)+ git 仓库初始化(7.9)+ 端口迁移 517x→527x(7.1.1)。
+**最后更新**:2026-10-18 · P14 全链路种子 + 3 个数据通路修复(6.14)+ P13 全字段强制编辑(6.13)+ P12 实时通知(6.11/6.12)+ git 仓库初始化(7.9)。

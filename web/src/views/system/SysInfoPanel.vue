@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { NCard, NGrid, NGi, NTag, NSpin } from 'naive-ui'
 import http from '@/api/client'
 
@@ -118,8 +118,9 @@ async function loadConfig() {
   }
 }
 
-watch(() => props.active, (v) => { if (v) { loadHealth(); loadTableStats(); loadConfig() } })
-onMounted(() => { loadHealth(); loadTableStats(); loadConfig() })
+// active 用 immediate —— 深链直达本页时 props.active 初始就是 true,
+// 不加 immediate 会因为「没发生变化」而不触发,导致数据永远是空
+watch(() => props.active, (v) => { if (v) { loadHealth(); loadTableStats(); loadConfig() } }, { immediate: true })
 </script>
 
 <style scoped>

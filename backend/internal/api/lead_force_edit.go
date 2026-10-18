@@ -334,11 +334,20 @@ func toAuditJSON(l model.Lead) model.JSONB {
 		"token_code":           l.TokenCode,
 		"status":               string(l.Status),
 		"claimed_by":           ptrVal(l.ClaimedBy),
+		"claimed_at":           ptrTime(l.ClaimedAt),
+		"released_by":          ptrVal(l.ReleasedBy),
+		"released_at":          ptrTime(l.ReleasedAt),
 		"extension":            l.Extension,
 		"remark":               l.Remark,
 		"paid_mark":            l.PaidMark,
-		"is_lost":              l.IsLost,
-		"lost_reason":          l.LostReason,
+		// 派生字段也导出 —— diffLeadFields 会把它们计入 changed_fields,
+		// 快照里没有值的话前端「对比」表会显示成「— → —」看不懂
+		"paid_marked_by":        ptrVal(l.PaidMarkedBy),
+		"paid_marked_at":        ptrTime(l.PaidMarkedAt),
+		"is_lost":               l.IsLost,
+		"lost_at":               ptrTime(l.LostAt),
+		"lost_reason":           l.LostReason,
+		"reactivated_at":        ptrTime(l.ReactivatedAt),
 		"last_player_active_at": ptrTime(l.LastPlayerActiveAt),
 	}
 }

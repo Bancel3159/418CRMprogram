@@ -37,6 +37,12 @@ func (a *Attributor) Attribute(order *model.Order) error {
 	}
 
 	// 查询匹配的 lead (player_id + game_id)
+	//
+	// P14:分两级匹配
+	//   1. 优先 pending / claimed(活跃线索)
+	//      —— 唯一命中才自动归属;多条命中仍是 pending(历史行为,人工介入)
+	//   2. 若一条都没命中,再退到 archived —— 已归档线索的历史订单仍需归到它头上,
+	//      否则玩家被归档后他的所有订单永久悬空(收入算不进该线索 / 玩家页显示 0)
 	var leads []model.Lead
 	if err := a.DB.Where(
 		"player_id = ? AND game_id = ? AND status IN ?",
@@ -46,16 +52,31 @@ func (a *Attributor) Attribute(order *model.Order) error {
 		return err
 	}
 
+	usedArchivedFallback := false
+	if len(leads) == 0 {
+		// fallback:已归档线索(取最新一条,历史订单归到最后一次归档的那条)
+		var archived []model.Lead
+		if err := a.DB.Where(
+			"player_id = ? AND game_id = ? AND status = ?",
+			order.PlayerID, order.GameID, model.LeadStatusArchived,
+		).Order("id DESC").Limit(1).Find(&archived).Error; err != nil {
+			return err
+		}
+		leads = archived
+		usedArchivedFallback = len(archived) > 0
+	}
+
 	order.MatchedLeadCount = len(leads)
 
-	if len(leads) == 1 {
+	// 自动归属条件:唯一命中,或走 archived fallback(此时因 Limit(1) 恒为 1 条)
+	if len(leads) == 1 || (usedArchivedFallback && len(leads) >= 1) {
 		lead := leads[0]
 		order.LeadID = &lead.ID
 		order.AttributionStatus = model.AttributionAuto
 		now := time.Now()
 		order.AttributedAt = &now
 	} else {
-		// 0 或多命中
+		// 0 命中(玩家不在任何 lead 里)/ 多条活跃线索命中 → 待人工处理
 		order.LeadID = nil
 		order.AttributionStatus = model.AttributionPending
 	}

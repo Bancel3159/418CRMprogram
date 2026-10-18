@@ -48,9 +48,11 @@
       </n-form>
 
       <div class="hint">
-        <div class="hint-title">测试账号</div>
-        <div class="hint-row"><span>普通员工</span><code>b_staff_01</code><code>pass123</code></div>
-        <div class="hint-row"><span>主管</span><code>b_manager_01</code><code>pass123</code></div>
+        <div class="hint-title">测试账号(密码都是 test123)</div>
+        <div class="hint-row"><span>B 部主管</span><code>p14_wangguan</code></div>
+        <div class="hint-row"><span>B 部组长</span><code>p14_ningchuan</code></div>
+        <div class="hint-row"><span>B 部员工</span><code>p14_guoyuan</code></div>
+        <div class="hint-row"><span>管理员</span><code>admin</code></div>
       </div>
     </div>
 

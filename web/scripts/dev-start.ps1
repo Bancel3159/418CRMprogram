@@ -42,12 +42,12 @@ function Stop-Occupying($port) {
   Write-Step ("Cleaning port " + $port)
   $conns = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
   foreach ($c in $conns) {
-    $pid = $c.OwningProcess
+    $procId = $c.OwningProcess   # 不要用 $pid(PowerShell 保留变量,只读)
     try {
-      $p = Get-Process -Id $pid -ErrorAction SilentlyContinue
+      $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
       if ($p) {
-        Write-Host ("  - killing PID " + $pid + " (" + $p.ProcessName + ")") -ForegroundColor DarkYellow
-        Stop-Process -Id $pid -Force
+        Write-Host ("  - killing PID " + $procId + " (" + $p.ProcessName + ")") -ForegroundColor DarkYellow
+        Stop-Process -Id $procId -Force
       }
     } catch {}
   }

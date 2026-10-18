@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -250,14 +251,21 @@ isNew := saved != nil && saved.ID > 0 && saved.CreatedAt.After(time.Now().Add(-5
 				Status:    model.AuditStatusSuccess,
 			})
 			// 告警
+			// P14:归属失败时说清楚原因 —— 之前只有 "pending_attribution" 三个字,
+			// 排查时看不出是「玩家不在任何 lead 里」还是「命中多条活跃 lead」,
+			// 也不知道是不是 game_id 传错了。补上 player / game / 命中数。
 			level := service.AlertLevelInfo
+			msg := saved.OrderNo + " / ¥" + service.FormatAmountFloat64(saved.Amount) + " / " + string(saved.AttributionStatus)
 			if saved.AttributionStatus == model.AttributionPending {
 				level = service.AlertLevelWarning
+				msg = fmt.Sprintf("%s / ¥%s / 归属失败: player=%s game=%s 命中 lead=%d 条 → 需人工处理",
+					saved.OrderNo, service.FormatAmountFloat64(saved.Amount),
+					saved.PlayerID, service.UintToString(uint(saved.GameID)), saved.MatchedLeadCount)
 			}
 			r.Alerter.Send(service.Alert{
 				Level:   level,
 				Title:   "Webhook 新订单",
-				Message: saved.OrderNo + " / ¥" + service.FormatAmountFloat64(saved.Amount) + " / " + string(saved.AttributionStatus),
+				Message: msg,
 				Link:    "/orders/" + service.UintToString(uint(saved.ID)),
 			})
 

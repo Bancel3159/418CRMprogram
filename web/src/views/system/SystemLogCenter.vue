@@ -11,13 +11,13 @@
 
     <n-card size="small" :bordered="false">
       <n-tabs v-model:value="activeTab" type="line" animated @update:value="onTabChange">
-        <n-tab-pane name="operation" tab="操作日志">
+        <n-tab-pane name="operation" tab="操作日志" display-directive="show">
           <OperationLogPanel :active="activeTab === 'operation'" />
         </n-tab-pane>
-        <n-tab-pane name="data" tab="数据变更审计">
+        <n-tab-pane name="data" tab="数据变更审计" display-directive="show">
           <DataChangePanel :active="activeTab === 'data'" />
         </n-tab-pane>
-        <n-tab-pane name="sysinfo" tab="系统运行信息">
+        <n-tab-pane name="sysinfo" tab="系统运行信息" display-directive="show">
           <SysInfoPanel :active="activeTab === 'sysinfo'" />
         </n-tab-pane>
       </n-tabs>

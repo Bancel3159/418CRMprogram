@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, h, onMounted, watch } from 'vue'
+import { ref, reactive, h, watch } from 'vue'
 import { NCard, NDataTable, NButton, NSpace, NTag, NSelect, NInput, NDatePicker, NGrid, NGi, NAlert, useMessage, useDialog, type DataTableColumns } from 'naive-ui'
 import http from '@/api/client'
 
@@ -257,8 +257,9 @@ function resetFilter() {
   loadList()
 }
 
-watch(() => props.active, (v) => { if (v) { loadList(); loadStats() } })
-onMounted(() => { loadList(); loadStats() })
+// active 用 immediate —— 深链直达本页时 props.active 初始就是 true,
+// 不加 immediate 会因为「没发生变化」而不触发,导致数据永远是空
+watch(() => props.active, (v) => { if (v) { loadList(); loadStats() } }, { immediate: true })
 </script>
 
 <style scoped>

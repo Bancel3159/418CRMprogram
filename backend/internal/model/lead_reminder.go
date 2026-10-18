@@ -61,6 +61,8 @@ type LeadReminder struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 	CompletedAt *time.Time     `json:"completed_at"` // 跟进完成的时间
 	CompletedBy *uint          `gorm:"index" json:"completed_by"` // 完成人
+	// P14:补软删(注释里写了但字段漏了 —— 误删提醒记录没法恢复)
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// 关联
 	Lead *Lead `gorm:"foreignKey:LeadID" json:"lead,omitempty"`

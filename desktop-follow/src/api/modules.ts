@@ -57,14 +57,32 @@ export const settingsApi = {
   update: (data: any) => instance.put('/users/me/settings', data)
 }
 
-// 玩家列表（只读，follow 端用于查询页）
+// 玩家（只读，follow 端用于查询页 + 玩家详情时间线）
 export const playerApi = {
-  list: (params: any) => instance.get('/players', { params })
+  list: (params: any) => instance.get('/players', { params }),
+  kpi: () => instance.get('/players/kpi'),
+  // P14:玩家详情（头部聚合 + leads 时间线 + orders + follow_records）
+  // 与 web 端 PlayerDrawer 完全同一个接口,数据结构一致
+  detail: (playerId: string, gameId: number | string) =>
+    instance.get(`/players/${encodeURIComponent(playerId)}/${gameId}`)
 }
 
-// 订单列表（只读，follow 端用于查询页）
+// 订单（只读，follow 端用于查询页）
 export const orderApi = {
-  list: (params: any) => instance.get('/orders', { params })
+  list: (params: any) => instance.get('/orders', { params }),
+  // P14:订单聚合统计(营收卡用)
+  stats: (params?: any) => instance.get('/orders/stats', { params })
+}
+
+// 游戏（下拉选项源：认领/编辑/筛选都要用）
+export const gameApi = {
+  list: (params?: any) => instance.get('/games', { params })
+}
+
+// 字典（下拉选项源：渠道 / 国家 / 区域等）
+export const dictApi = {
+  categories: () => instance.get('/dicts/categories'),
+  list: (params?: any) => instance.get('/dicts', { params })
 }
 
 // 统计（follow 端看板）

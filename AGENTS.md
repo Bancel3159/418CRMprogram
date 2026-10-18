@@ -385,6 +385,35 @@ E:\MyProject\418CRMprogram\
 
 **验证方式**:用 B 部账号登录 follow 端,今日待办 / 我的玩家 / 维护看板三个页面都应该有数据(修复前分别是空 / 9 条 / 0)
 
+### 6.15 follow 端复用 web 端:只复用数据层,不抽组件
+
+**API 覆盖差距**(P14 补完后):web 端 47 个 API 路径 vs follow 端 25 个。
+follow 补齐的这几组是复用 web 逻辑时立刻会用到的:
+
+| API | 用途 |
+|-----|------|
+| playerApi.kpi | 玩家 KPI 卡 |
+| playerApi.detail(pid, gid) | 玩家详情(聚合 + leads 时间线 + orders + follow_records);player_id 走 encodeURIComponent |
+| orderApi.stats | 订单聚合统计(营收卡) |
+| gameApi.list | 游戏下拉(认领 / 编辑 / 筛选) |
+| dictApi.categories / dictApi.list | 字典下拉 |
+
+**为什么不做组件抽象**(评估过两处重复,结论都是不值得):
+
+1. **web AlertBell vs follow NotificationBell** —— 两套 WS 机制根本不同:
+   - web:组件内自建 
+ew WebSocket() + 主动 send({type:'subscribe'})
+   - follow:Pinia store 共享连接 + 后端连接时就订阅好
+   - 频道也不同(lert:admin vs ollow:realtime)
+   - 强行合并要统一连接模型,改动面远大于省下的 6KB
+
+2. **follow LeadDetail vs web PlayerDrawer** —— 定位不同:
+   - follow 按 **lead 维度操作**(认领 / 归档 / 标记付费 / 写跟进 / 跟进历史)
+   - web 按 **player 维度只读浏览**
+   - 合起来会把 follow 的操作按钮塞进 web 的只读视图
+
+**结论**:shared/ 继续保持占位(代码 0 复用)。三端共用同一套后端 + 同一套数据结构,这层复用已经够了;组件层强行抽象反而制造耦合。
+
 ---
 
 ## 7. 踩过的坑(下次别再栽)

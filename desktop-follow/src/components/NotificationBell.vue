@@ -22,7 +22,7 @@
           @click="togglePanel"
         >
           <template #icon>
-            <span style="font-size: 18px">🔔</span>
+            <span style="font-size: 18px"></span>
           </template>
         </n-button>
       </n-badge>
@@ -31,7 +31,7 @@
     <!-- 面板内容 -->
     <div class="notif-panel">
       <div class="notif-header">
-        <span class="notif-title">📬 实时通知</span>
+        <span class="notif-title">实时通知</span>
         <n-space size="small">
           <n-button v-if="wsStore.unreadCount > 0" size="tiny" @click="markAllRead">
             全部已读
@@ -44,7 +44,7 @@
 
       <div class="notif-body">
         <div v-if="wsStore.notifications.length === 0" class="notif-empty">
-          <div style="font-size: 32px; opacity: 0.4">🔕</div>
+          <div style="font-size: 32px; opacity: 0.4"></div>
           <div style="color: #9ca3af; font-size: 13px; margin-top: 6px">暂无通知</div>
         </div>
 

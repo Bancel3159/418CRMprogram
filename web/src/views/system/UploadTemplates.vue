@@ -29,7 +29,7 @@
           </n-gi>
         </n-grid>
 
-        <n-divider>字段映射(系统字段 → Excel 列名)</n-divider>
+        <n-divider>字段映射(系统字段  Excel 列名)</n-divider>
         <n-alert type="info" :show-icon="false" style="margin-bottom: 12px">
           必填字段: order_no / player_id / amount / order_time。可选: currency / status / paid_at / remark。
         </n-alert>
@@ -41,25 +41,25 @@
           </n-gi>
         </n-grid>
 
-        <n-divider>状态映射(原始值 → 系统状态)</n-divider>
+        <n-divider>状态映射(原始值  系统状态)</n-divider>
         <n-grid :cols="2" :x-gap="16" :y-gap="8">
           <n-gi>
-            <n-form-item label="已支付 → paid">
+            <n-form-item label="已支付  paid">
               <n-input v-model:value="editing.status_mapping['已支付']" placeholder="如 已支付" />
             </n-form-item>
           </n-gi>
           <n-gi>
-            <n-form-item label="已退款 → refunded">
+            <n-form-item label="已退款  refunded">
               <n-input v-model:value="editing.status_mapping['已退款']" placeholder="如 已退款" />
             </n-form-item>
           </n-gi>
           <n-gi>
-            <n-form-item label="待支付 → pending">
+            <n-form-item label="待支付  pending">
               <n-input v-model:value="editing.status_mapping['待支付']" placeholder="如 待支付" />
             </n-form-item>
           </n-gi>
           <n-gi>
-            <n-form-item label="已取消 → cancelled">
+            <n-form-item label="已取消  cancelled">
               <n-input v-model:value="editing.status_mapping['已取消']" placeholder="如 已取消" />
             </n-form-item>
           </n-gi>

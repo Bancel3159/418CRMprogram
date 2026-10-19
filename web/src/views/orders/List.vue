@@ -2,7 +2,7 @@
   <div>
     <div class="page-header">
       <n-space>
-        <n-button v-if="userStore.isAdmin" @click="goImport">📤 手动导入</n-button>
+        <n-button v-if="userStore.isAdmin" @click="goImport">手动导入</n-button>
         <n-button @click="loadList" :loading="loading">刷新</n-button>
       </n-space>
     </div>

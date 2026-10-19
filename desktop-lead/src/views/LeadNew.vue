@@ -4,7 +4,7 @@
     <div class="page-head">
       <div>
         <div class="page-title">新注册</div>
-        <div class="page-sub">填写注册信息 → 上传截图 → 推送给后端</div>
+        <div class="page-sub">填写注册信息  上传截图  推送给后端</div>
       </div>
       <n-button size="small" quaternary @click="resetForm">清空</n-button>
     </div>
@@ -332,7 +332,7 @@ async function handleSubmit() {
         if (!f.file) continue
         await uploadApi.upload(f.file as File)
       }
-      steps.value.push(`[1] ✓ 上传完成`)
+      steps.value.push(`[1]  上传完成`)
       currentStep.value = 1
     }
 
@@ -353,13 +353,13 @@ async function handleSubmit() {
       extension
     }
     const resp: any = await leadApi.create(payload)
-    steps.value.push(`[2] ✓ 已创建(ID: ${resp.data.lead.id})`)
+    steps.value.push(`[2]  已创建(ID: ${resp.data.lead.id})`)
     currentStep.value = 2
 
     if (resp.data.rendered_message) {
       steps.value.push(`[3] 广播:${resp.data.rendered_message}`)
     }
-    steps.value.push('[3] ✓ 已推送给后端部门')
+    steps.value.push('[3]  已推送给后端部门')
     stepStatus.value = 'finish'
     currentStep.value = 3
 
@@ -367,7 +367,7 @@ async function handleSubmit() {
     setTimeout(() => resetForm(), 1500)
   } catch (err: any) {
     stepStatus.value = 'error'
-    steps.value.push(`[X] ✗ ${err?.message || '提交失败'}`)
+    steps.value.push(`[X]  ${err?.message || '提交失败'}`)
     message.error(err?.message || '提交失败')
   } finally {
     submitting.value = false

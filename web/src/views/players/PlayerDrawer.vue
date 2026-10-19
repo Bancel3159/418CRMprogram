@@ -75,7 +75,7 @@
                     <div v-if="item.type === 'lead'">
                       <div><b>玩家名:</b>{{ item.data.player_username || '—' }} · <b>渠道:</b>{{ item.data.channel }}</div>
                       <div v-if="item.data.remark"><b>备注:</b>{{ item.data.remark }}</div>
-                      <div v-if="item.data.is_target === 'target'" style="color: #10b981">✓ 目标玩家</div>
+                      <div v-if="item.data.is_target === 'target'" style="color: #10b981">目标玩家</div>
                     </div>
                     <div v-else-if="item.type === 'follow'">
                       <n-tag size="tiny">{{ item.data.follow_type }}</n-tag>

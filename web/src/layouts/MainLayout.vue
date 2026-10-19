@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NDropdown, NAvatar, NTag, type MenuOption, type DropdownOption } from 'naive-ui'
 import { useUserStore } from '@/stores/user'
@@ -72,17 +72,16 @@ const currentTitle = computed(() => (route.meta.title as string) || '418 CRM')
 // 菜单
 const menuOptions = computed<MenuOption[]>(() => {
   const baseMenus: MenuOption[] = [
-    { label: '数据看板', key: '/dashboard', icon: () => h('span', '📊') },
-    { label: '线索管理', key: '/leads', icon: () => h('span', '📝') },
-    { label: '玩家列表', key: '/players', icon: () => h('span', '👥') },
-    { label: '订单数据', key: '/orders', icon: () => h('span', '💰') }
+    { label: '数据看板', key: '/dashboard' },
+    { label: '线索管理', key: '/leads' },
+    { label: '玩家列表', key: '/players' },
+    { label: '订单数据', key: '/orders' }
   ]
 
   const systemMenus: MenuOption[] = [
     {
       label: '系统管理',
       key: 'system',
-      icon: () => h('span', '⚙️'),
       children: [
         { label: '用户管理', key: '/system/users' },
         { label: '部门管理', key: '/system/departments' },

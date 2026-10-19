@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-header">
-      <n-button @click="$router.back()">← 返回</n-button>
+      <n-button @click="$router.back()">返回</n-button>
     </div>
 
     <n-card>
@@ -11,7 +11,7 @@
           <li>先到「<router-link to="/system/upload-templates">上传模板管理</router-link>」按游戏配置字段映射模板</li>
           <li>选择游戏 + 模板 + 上传文件(CSV / Excel)</li>
           <li>点击「预览」可先查看解析结果(不入库)</li>
-          <li>点击「导入」直接入库,自动执行归属(命中唯一 lead → 自动绑定,否则待人工)</li>
+          <li>点击「导入」直接入库,自动执行归属(命中唯一 lead  自动绑定,否则待人工)</li>
         </ol>
       </n-alert>
 
@@ -36,8 +36,8 @@
         </n-form-item>
         <n-form-item>
           <n-space>
-            <n-button :disabled="!canPreview" :loading="previewing" @click="doPreview">📋 仅预览</n-button>
-            <n-button type="primary" :disabled="!canImport" :loading="importing" @click="doImport">📤 导入入库</n-button>
+            <n-button :disabled="!canPreview" :loading="previewing" @click="doPreview">仅预览</n-button>
+            <n-button type="primary" :disabled="!canImport" :loading="importing" @click="doImport">导入入库</n-button>
           </n-space>
         </n-form-item>
       </n-form>
@@ -46,7 +46,7 @@
     <!-- 预览结果 -->
     <n-card v-if="previewResult" title="预览结果" style="margin-top: 16px">
       <n-alert :type="previewResult.errors?.length ? 'warning' : 'success'" style="margin-bottom: 12px">
-        共解析 <strong>{{ previewResult.total_rows }}</strong> 行有效数据
+        共解析 <strong>{{ previewResult.total_rows }}</strong>行有效数据
         <span v-if="previewResult.errors?.length">,{{ previewResult.errors.length }} 行错误</span>
       </n-alert>
 

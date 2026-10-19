@@ -44,7 +44,7 @@
     </n-grid>
 
     <!-- 转化漏斗 -->
-    <n-card title="🎯 A→B 转化漏斗" style="margin-top: 16px">
+    <n-card title=" AB 转化漏斗" style="margin-top: 16px">
       <n-grid :cols="4" :x-gap="16">
         <n-gi>
           <div style="text-align: center">
@@ -72,12 +72,12 @@
         </n-gi>
       </n-grid>
       <div v-if="funnel.avg_claim_duration_seconds > 0" style="margin-top: 16px; color: #6b7280; font-size: 13px">
-        ⏱ 平均认领时长：<strong>{{ formatDuration(funnel.avg_claim_duration_seconds) }}</strong>（样本 {{ funnel.avg_claim_count }} 条）
+         平均认领时长：<strong>{{ formatDuration(funnel.avg_claim_duration_seconds) }}</strong>（样本 {{ funnel.avg_claim_count }} 条）
       </div>
     </n-card>
 
     <!-- P7：营收 / ARPU / A&B 业绩 -->
-    <n-card title="💰 营收指标 (订单数据)" style="margin-top: 16px">
+    <n-card title="营收指标 (订单数据)" style="margin-top: 16px">
       <n-grid :cols="6" :x-gap="12" :y-gap="12">
         <n-gi span="1 m:1 l:1">
           <div class="mini-stat">
@@ -123,15 +123,15 @@
         </n-gi>
       </n-grid>
       <div v-if="orderStats.pending_orders > 0" style="margin-top: 12px; padding: 8px 12px; background: #fff7e6; border-radius: 4px; color: #d97706; font-size: 13px">
-        ⚠️ 当前有 <strong>{{ orderStats.pending_orders }}</strong> 个订单待人工绑定 lead
-        <router-link to="/orders?attribution_status=pending_attribution" style="margin-left: 12px; color: #d97706">立即处理 →</router-link>
+         当前有 <strong>{{ orderStats.pending_orders }}</strong>个订单待人工绑定 lead
+        <router-link to="/orders?attribution_status=pending_attribution" style="margin-left: 12px; color: #d97706">立即处理 </router-link>
       </div>
     </n-card>
 
     <n-grid :cols="2" :x-gap="16" :y-gap="16" responsive="screen" item-responsive style="margin-top: 16px">
       <!-- 拉新趋势（按天） -->
       <n-gi span="1 m:1 l:1">
-        <n-card title="📈 拉新趋势">
+        <n-card title="拉新趋势">
           <div v-if="trend.length === 0" class="text-muted">暂无数据</div>
           <div v-else style="display: flex; align-items: flex-end; height: 180px; gap: 4px">
             <div
@@ -157,7 +157,7 @@
 
       <!-- 时段分布 -->
       <n-gi span="1 m:1 l:1">
-        <n-card title="⏰ 拉新时段（按小时）">
+        <n-card title="拉新时段（按小时）">
           <div v-if="hourly.length === 0" class="text-muted">暂无数据</div>
           <div v-else style="display: flex; align-items: flex-end; height: 180px; gap: 2px">
             <div
@@ -182,7 +182,7 @@
     <n-grid :cols="3" :x-gap="16" :y-gap="16" responsive="screen" item-responsive style="margin-top: 16px">
       <!-- 按游戏 -->
       <n-gi span="1 m:1 l:1">
-        <n-card title="🎮 按游戏分布">
+        <n-card title="按游戏分布">
           <div v-if="byGame.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="g in byGame" :key="g.game_id" style="margin-bottom: 12px">
@@ -198,7 +198,7 @@
 
       <!-- 按渠道 -->
       <n-gi span="1 m:1 l:1">
-        <n-card title="📡 按渠道分布">
+        <n-card title="按渠道分布">
           <div v-if="byChannel.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="c in byChannel" :key="c.channel" style="margin-bottom: 12px">
@@ -214,7 +214,7 @@
 
       <!-- 按国家（Top 10） -->
       <n-gi span="1 m:1 l:1">
-        <n-card title="🌍 按国家（Top 10）">
+        <n-card title="按国家（Top 10）">
           <div v-if="byCountry.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="c in byCountry" :key="c.country" style="margin-bottom: 12px">
@@ -232,7 +232,7 @@
     <!-- 业绩排行 -->
     <n-grid :cols="2" :x-gap="16" :y-gap="16" responsive="screen" item-responsive style="margin-top: 16px">
       <n-gi span="1 m:1 l:1">
-        <n-card title="🏆 A 部拉新 TOP 10">
+        <n-card title=" A 部拉新 TOP 10">
           <div v-if="topStaff.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="(u, idx) in topStaff" :key="u.user_id" style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6">
@@ -248,7 +248,7 @@
       </n-gi>
 
       <n-gi span="1 m:1 l:1">
-        <n-card title="🛡️ B 部维护 TOP 10">
+        <n-card title=" B 部维护 TOP 10">
           <div v-if="topMaintainer.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="(u, idx) in topMaintainer" :key="u.user_id" style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6">

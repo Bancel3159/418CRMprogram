@@ -35,7 +35,7 @@ const DEFAULT_COMBO = 'Ctrl+`' // 默认 Ctrl + 反引号(`)
 
 /**
  * 挂载时把当前用户绑定的快捷键组合应用到 Rust 侧,完成"前端决定,Rust 注册"的链路。
- * - 首次启动:localStorage 没值 → 用默认 Ctrl+`
+ * - 首次启动:localStorage 没值  用默认 Ctrl+`
  * - 用户改过:从 localStorage 读出上次保存的 combo 字符串,重新注册
  * - 用户选「disabled」:Rust 注销旧快捷键并跳过注册
  * 注:此操作在浏览器 dev 模式下 invoke 会失败 —— 静默忽略即可(Vite 用,无 Rust)。

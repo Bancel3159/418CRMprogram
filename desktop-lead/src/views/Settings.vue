@@ -97,7 +97,7 @@ const isDirty = computed(() => capturedCombo.value && capturedCombo.value !== cu
 const isEnabled = computed(() => currentCombo.value !== 'disabled')
 
 // ============ 键映射 ============
-// KeyboardEvent.code → combo token (与 global-hotkey crate 的 parse_key 对齐)
+// KeyboardEvent.code  combo token (与 global-hotkey crate 的 parse_key 对齐)
 const CODE_TO_TOKEN: Record<string, string> = {
   Backquote: '`',
   Backslash: '\\',

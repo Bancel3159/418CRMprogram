@@ -124,7 +124,7 @@ const columns: DataTableColumns<any> = [
     title: '动作', key: 'action', width: 150,
     render: (r) => {
       const isForce = r.extension?.force_edit === true
-      return h(NTag, { size: 'small', type: isForce ? 'error' : 'info', bordered: isForce }, () => isForce ? '⚡ 强制编辑' : actionLabel(r.action))
+      return h(NTag, { size: 'small', type: isForce ? 'error' : 'info', bordered: isForce }, () => isForce ? '强制编辑' : actionLabel(r.action))
     }
   },
   { title: '对象', key: 'target_label', width: 180, ellipsis: { tooltip: true } },

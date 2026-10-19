@@ -102,7 +102,7 @@ export const useWSStore = defineStore('ws', () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications.value))
     } catch {
-      // 容量满 / 隐私模式 → 静默
+      // 容量满 / 隐私模式  静默
     }
   }
 
@@ -117,7 +117,7 @@ export const useWSStore = defineStore('ws', () => {
         id: `${msg.time}_${msg.event}_${data.order_id}`,
         event: msg.event,
         channel: msg.channel,
-        title: `💰 高额订单 ¥${data.amount}`,
+        title: `高额订单 ¥${data.amount}`,
         body: `${data.game_code || ''} 玩家 ${data.player_id} 充值 ¥${data.amount}(阈值 ¥${data.high_value_threshold})` +
               (data.claimed_by_name ? ` · 维护员 ${data.claimed_by_name}` : ' · 暂无人认领'),
         link: data.lead_id ? `/leads/${data.lead_id}` : undefined,
@@ -137,7 +137,7 @@ export const useWSStore = defineStore('ws', () => {
         id: `${msg.time}_${msg.event}_${data.order_id}`,
         event: msg.event,
         channel: msg.channel,
-        title: `💳 玩家充值 ¥${data.amount}`,
+        title: `玩家充值 ¥${data.amount}`,
         body: `${data.game_code || ''} 玩家 ${data.player_id} 支付 ¥${data.amount}` +
               (data.claimed_by_name ? ` · 维护员 ${data.claimed_by_name}` : ' · 暂无人认领'),
         link: data.lead_id ? `/leads/${data.lead_id}` : undefined,
@@ -157,7 +157,7 @@ export const useWSStore = defineStore('ws', () => {
         id: `${msg.time}_${msg.event}_${data.player_id}_${data.game_id}`,
         event: msg.event,
         channel: msg.channel,
-        title: data.was_lost ? `🌱 玩家重新激活` : `📍 玩家活跃更新`,
+        title: data.was_lost ? `玩家重新激活` : `玩家活跃更新`,
         body: `${data.game_code || ''} 玩家 ${data.player_id} ${data.was_lost ? '再次上线,已从流失状态恢复' : '最近活跃'}` +
               (data.claimed_by_name ? ` · 维护员 ${data.claimed_by_name}` : ''),
         link: data.lead_id ? `/leads/${data.lead_id}` : undefined,

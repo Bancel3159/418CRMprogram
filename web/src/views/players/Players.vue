@@ -108,7 +108,7 @@ async function loadDefaultView() {
     const resp: any = await listViewApi.getDefault('player')
     viewFields.value = (resp.data?.fields || []) as ListViewField[]
   } catch (e) {
-    // 失败时给个空数组 → 列表为空,提示用户去配置中心设置
+    // 失败时给个空数组  列表为空,提示用户去配置中心设置
     viewFields.value = []
   }
 }

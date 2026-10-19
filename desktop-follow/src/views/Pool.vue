@@ -9,7 +9,7 @@
       </div>
       <n-space>
         <n-tag :type="wsStore.connected ? 'success' : 'error'" size="small">
-          {{ wsStore.connected ? '🟢 实时推送已连接' : '🔴 离线' }}
+          {{ wsStore.connected ? '实时推送已连接' : '离线' }}
         </n-tag>
         <n-button @click="loadList" :loading="loading">刷新</n-button>
       </n-space>
@@ -23,7 +23,7 @@
       style="margin-bottom: 16px"
       @close="latestBroadcast = null"
     >
-      <strong>🆕 新线索：</strong>{{ latestBroadcast }}
+      <strong>新线索：</strong>{{ latestBroadcast }}
     </n-alert>
 
     <!-- 线索列表 -->
@@ -59,7 +59,7 @@
 
         <n-space vertical>
           <n-button type="primary" size="large" :loading="claimingId === lead.id" @click="handleClaim(lead)">
-            🎯 抢单认领
+             抢单认领
           </n-button>
           <n-button size="small" text @click="viewDetail(lead.id)">查看详情</n-button>
         </n-space>
@@ -118,13 +118,13 @@ async function handleClaim(lead: any) {
       try {
         await navigator.clipboard.writeText(token)
         notification.success({
-          title: '🎯 认领成功',
+          title: '认领成功',
           content: `Token 已自动复制到剪贴板！\n长度：${token.length} 字符`,
           duration: 5000
         })
       } catch {
         notification.warning({
-          title: '⚠️ 自动复制失败',
+          title: '自动复制失败',
           content: `Token: ${token}\n请手动复制`,
           duration: 8000
         })
@@ -148,7 +148,7 @@ function handleWSMessage(msg: any) {
     const summary = `${d.game_code || ''} 新玩家：${d.player_country || ''}${d.player_age || ''}岁 加入${d.region || ''}区（${d.is_target || ''}）`
     latestBroadcast.value = summary
     notification.info({
-      title: '🆕 新线索进入公开池',
+      title: '新线索进入公开池',
       content: summary + (d.rendered_message ? `\n${d.rendered_message}` : ''),
       duration: 6000
     })

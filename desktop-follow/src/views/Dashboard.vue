@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-header">
-      <span style="font-size: 18px; font-weight: 700">📊 我的维护看板</span>
+      <span style="font-size: 18px; font-weight: 700">我的维护看板</span>
       <n-space align="center">
         <n-select v-model:value="days" :options="dayOptions" style="width: 110px" @update:value="loadOverview" />
         <n-button @click="loadOverview" :loading="loading">刷新</n-button>
@@ -41,7 +41,7 @@
     </n-grid>
 
     <!-- 今日小卡 -->
-    <n-card title="📅 今日" style="margin-top: 16px">
+    <n-card title="今日" style="margin-top: 16px">
       <n-grid :cols="3" :x-gap="12">
         <n-gi>
           <div class="mini-stat">
@@ -65,7 +65,7 @@
     </n-card>
 
     <!-- 趋势 -->
-    <n-card title="📈 每日趋势" style="margin-top: 16px">
+    <n-card title="每日趋势" style="margin-top: 16px">
       <div v-if="trend.length === 0" class="text-muted">暂无数据</div>
       <div v-else style="display: flex; align-items: flex-end; height: 180px; gap: 6px; padding: 8px 0">
         <div
@@ -82,17 +82,17 @@
         </div>
       </div>
       <div style="display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: #6b7280">
-        <span><span style="display: inline-block; width: 10px; height: 10px; background: #3b82f6; border-radius: 2px; margin-right: 4px" /> 认领</span>
-        <span><span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px; margin-right: 4px" /> 跟进</span>
+        <span><span style="display: inline-block; width: 10px; height: 10px; background: #3b82f6; border-radius: 2px; margin-right: 4px" />认领</span>
+        <span><span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px; margin-right: 4px" />跟进</span>
       </div>
     </n-card>
 
     <!-- 跳转到我的玩家 / 公开池 -->
     <n-card style="margin-top: 16px">
       <n-space>
-        <n-button type="primary" @click="$router.push('/leads')">👥 查看我的玩家</n-button>
-        <n-button @click="$router.push('/pool')">🆕 公开池</n-button>
-        <n-button @click="$router.push('/search')">🔍 查询玩家</n-button>
+        <n-button type="primary" @click="$router.push('/leads')">查看我的玩家</n-button>
+        <n-button @click="$router.push('/pool')">公开池</n-button>
+        <n-button @click="$router.push('/search')">查询玩家</n-button>
       </n-space>
     </n-card>
   </div>

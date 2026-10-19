@@ -5,25 +5,25 @@
         <span class="page-title">玩家 #{{ lead.id }}</span>
         <n-tag :type="statusType" size="small" style="margin-left: 8px">{{ statusLabel }}</n-tag>
         <n-tag v-if="lead.is_lost" type="error" size="small" style="margin-left: 8px">
-          ⚠️ 已流失 {{ lead.lost_reason ? `(${lostReasonLabel})` : '' }}
+           已流失 {{ lead.lost_reason ? `(${lostReasonLabel})` : '' }}
         </n-tag>
         <n-tag v-if="lead.reactivated_at" type="success" size="small" style="margin-left: 8px">
-          🔄 已激活
+           已激活
         </n-tag>
       </div>
       <n-space>
         <n-button @click="$router.back()">返回</n-button>
         <n-button v-if="lead.status === 'claimed' && canMarkPaid && !lead.is_paid" :loading="markPaidLoading" type="primary" @click="handleMarkPaid">
-          💰 标记已付费
+           标记已付费
         </n-button>
         <n-button v-if="lead.status === 'claimed' && canMarkPaid && lead.is_paid" :loading="markPaidLoading" quaternary @click="handleUnmarkPaid">
           取消已付费标记
         </n-button>
         <n-button v-if="lead.status === 'claimed' && !lead.is_lost && isManager" :loading="markLostLoading" type="error" quaternary @click="handleMarkLost">
-          ⚠️ 手动标记流失
+           手动标记流失
         </n-button>
         <n-button v-if="lead.is_lost && isManager" :loading="markActiveLoading" type="success" quaternary @click="handleMarkActive">
-          🔄 手动激活
+           手动激活
         </n-button>
         <n-button v-if="lead.status === 'claimed'" :loading="actionLoading" @click="handleArchive">归档</n-button>
       </n-space>
@@ -31,7 +31,7 @@
 
     <!-- 付费状态横幅 -->
     <div v-if="lead.is_paid" class="paid-banner">
-      <span class="paid-icon">💰</span>
+      <span class="paid-icon"></span>
       <span class="paid-text">
         <b>本线索已计入「已付费」</b>
         <small class="muted">
@@ -72,7 +72,7 @@
       </n-gi>
 
       <n-gi>
-        <n-card title="🔐 Discord Token">
+        <n-card title=" Discord Token">
           <template #header-extra>
             <n-tag type="warning" size="small">公司自有账号</n-tag>
           </template>
@@ -84,10 +84,10 @@
 
           <n-space style="margin-top: 12px" v-if="lead.token_code">
             <n-button type="primary" size="small" @click="copyToken">
-              📋 复制到剪贴板
+               复制到剪贴板
             </n-button>
             <n-button size="small" @click="openDiscord">
-              🚀 启动 Discord
+               启动 Discord
             </n-button>
           </n-space>
 
@@ -123,7 +123,7 @@
     </n-grid>
 
     <!-- P11 跟进表单(只有已认领的 lead 可以跟进) -->
-    <n-card v-if="lead.status === 'claimed'" title="✍️ 写跟进记录" style="margin-top: 16px">
+    <n-card v-if="lead.status === 'claimed'" title="写跟进记录" style="margin-top: 16px">
       <n-form :model="followForm" :rules="followRules" ref="formRef" label-placement="left" label-width="80">
         <n-form-item label="类型" path="follow_type">
           <n-select v-model:value="followForm.follow_type" :options="followTypeOptions" style="width: 180px" />
@@ -139,14 +139,14 @@
         <n-space justify="end">
           <n-button @click="resetFollowForm">清空</n-button>
           <n-button type="primary" :loading="followSubmitting" @click="handleSubmitFollow">
-            📝 提交跟进
+             提交跟进
           </n-button>
         </n-space>
       </n-form>
     </n-card>
 
     <!-- P11 跟进历史 -->
-    <n-card title="📜 跟进历史 ({{ followRecords.length }})" style="margin-top: 16px">
+    <n-card title="跟进历史 ({{ followRecords.length }})" style="margin-top: 16px">
       <n-empty v-if="followRecords.length === 0" description="暂无跟进记录" />
       <n-timeline v-else>
         <n-timeline-item
@@ -202,15 +202,15 @@ const followRules = {
 }
 
 const followTypeOptions = [
-  { label: '💬 文字沟通', value: 'text' },
-  { label: '📞 电话', value: 'call' },
-  { label: '🌐 在线', value: 'online' },
-  { label: '💬 微信', value: 'wechat' },
-  { label: '🤝 Discord', value: 'discord' },
-  { label: '📧 邮件', value: 'email' }
+  { label: '文字沟通', value: 'text' },
+  { label: '电话', value: 'call' },
+  { label: '在线', value: 'online' },
+  { label: '微信', value: 'wechat' },
+  { label: ' Discord', value: 'discord' },
+  { label: '邮件', value: 'email' }
 ]
 
-const followTypeLabel = (t: string) => followTypeOptions.find(o => o.value === t)?.label || `📝 ${t}`
+const followTypeLabel = (t: string) => followTypeOptions.find(o => o.value === t)?.label || ` ${t}`
 
 // 当前用户是否能手动标记付费 / 流失 / 激活(主管及以上)
 const canMarkPaid = computed(() => {
@@ -250,7 +250,7 @@ async function copyToken() {
   if (!lead.value?.token_code) return
   try {
     await navigator.clipboard.writeText(lead.value.token_code)
-    message.success('✓ Token 已复制到剪贴板')
+    message.success(' Token 已复制到剪贴板')
   } catch {
     message.error('复制失败，请手动选中复制')
   }
@@ -282,7 +282,7 @@ async function handleMarkPaid() {
   try {
     const resp: any = await leadApi.markPaid(lead.value.id)
     lead.value = resp.data
-    message.success('✓ 已标记为已付费')
+    message.success('已标记为已付费')
   } catch (err: any) {
     message.error(err?.message || '标记失败')
   } finally {
@@ -343,7 +343,7 @@ async function handleSubmitFollow() {
       follow_type: followForm.follow_type,
       content: followForm.content
     })
-    message.success('✓ 跟进已记录(今日待办已完成)')
+    message.success('跟进已记录(今日待办已完成)')
     // 重置表单
     followForm.content = ''
     // 刷新跟进记录
@@ -386,7 +386,7 @@ onMounted(async () => {
   await loadFollowRecords()
 })
 
-// P12 实时事件:当前 lead 收到 order.* / player.react → 自动刷新详情
+// P12 实时事件:当前 lead 收到 order.* / player.react  自动刷新详情
 const wsStore = useWSStore()
 const currentLeadId = computed(() => Number(route.params.id))
 

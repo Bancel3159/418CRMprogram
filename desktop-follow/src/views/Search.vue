@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-header">
-      <span style="font-size: 18px; font-weight: 700">🔍 查询</span>
+      <span style="font-size: 18px; font-weight: 700">查询</span>
     </div>
 
     <n-card size="small" :bordered="false" style="margin-bottom: 16px">

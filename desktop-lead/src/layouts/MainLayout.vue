@@ -21,9 +21,6 @@
           :title="`${displayName} - 点击展开菜单`"
           style="cursor: pointer"
         >
-          <template #icon>
-            <span style="font-size: 12px">👤</span>
-          </template>
           {{ displayName }}
         </n-tag>
       </n-dropdown>
@@ -39,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { NLayout, NLayoutHeader, NLayoutContent, NTag, NDropdown } from 'naive-ui'
 import { useUserStore } from '@/stores/user'
@@ -56,19 +53,16 @@ const displayName = computed(
 const userMenuOptions = [
   {
     label: '数据看板',
-    key: 'dashboard',
-    icon: () => h('span', { style: 'font-size: 14px' }, '📊')
+    key: 'dashboard'
   },
   {
     label: '快捷键设置',
-    key: 'settings',
-    icon: () => h('span', { style: 'font-size: 14px' }, '⚙')
+    key: 'settings'
   },
   { type: 'divider', key: 'd1' },
   {
     label: '退出',
-    key: 'logout',
-    icon: () => h('span', { style: 'font-size: 14px; color: #ef4444' }, '⏻')
+    key: 'logout'
   }
 ]
 

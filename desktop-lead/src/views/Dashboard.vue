@@ -39,7 +39,7 @@
     <!-- 视角标签:谁的数据 -->
     <div v-if="data.target" class="scope-banner" :class="`banner-${data.target.scope}`">
       <span class="scope-icon">
-        {{ data.target.scope === 'self' ? '📌' : data.target.scope === 'all' ? '📊' : '👤' }}
+        {{ data.target.scope === 'self' ? '' : data.target.scope === 'all' ? '' : '' }}
       </span>
       <span class="scope-text">
         <b>当前查看:</b>
@@ -93,8 +93,8 @@
             <span class="rank-of">/ {{ data.rank.total_a_staff }} 人</span>
           </div>
           <div class="rank-meta">
-            本期你的注册 <b>{{ data.rank.lead_count }}</b> 条 ·
-            A 部合计 <b>{{ data.rank.total }}</b> 条
+            本期你的注册 <b>{{ data.rank.lead_count }}</b>条 ·
+            A 部合计 <b>{{ data.rank.total }}</b>条
           </div>
           <!-- 排名进度条 -->
           <div v-if="data.rank.total_a_staff > 0" class="rank-bar">
@@ -109,7 +109,7 @@
         </div>
       </div>
 
-      <!-- 漏斗:已对接 → 已付费 → 已流失 -->
+      <!-- 漏斗:已对接  已付费  已流失 -->
       <div class="card card-status">
         <div class="card-title">注册转化</div>
         <div class="status-row">
@@ -117,12 +117,12 @@
             <div class="status-value">{{ data.by_status.engaged }}</div>
             <div class="status-label">已对接</div>
           </div>
-          <div class="status-arrow">→</div>
+          <div class="status-arrow"></div>
           <div class="status-box s-paid">
             <div class="status-value">{{ data.by_status.paid }}</div>
             <div class="status-label">已付费</div>
           </div>
-          <div class="status-arrow">→</div>
+          <div class="status-arrow"></div>
           <div class="status-box s-archived">
             <div class="status-value">{{ data.by_status.archived }}</div>
             <div class="status-label">已流失</div>
@@ -267,7 +267,7 @@ function formatRoleLabel(r: string): string {
   }[r] || r
 }
 
-// 后端响应类型(避免 any → 让 TS 收紧)
+// 后端响应类型(避免 any  让 TS 收紧)
 interface TrendPoint { date: string; count: number }
 interface ChannelPoint { channel: string; count: number; percent: number }
 interface CountryPoint { country: string; count: number; percent: number }

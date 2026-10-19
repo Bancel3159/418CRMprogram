@@ -10,7 +10,7 @@
       :native-scrollbar="false"
     >
       <div class="logo">
-        <span style="font-size: 18px; font-weight: 700; color: #f59e0b">🎯 维护端</span>
+        <span style="font-size: 18px; font-weight: 700; color: #f59e0b">维护端</span>
       </div>
       <n-menu
         :value="currentMenuKey"
@@ -31,7 +31,7 @@
             <template #trigger>
               <n-space align="center" size="small" :wrap-item="false">
                 <span style="font-size: 13px; color: #4b5563">
-                  {{ userStore.acceptOrders ? '🟢 接单中' : '🔴 休息中' }}
+                  {{ userStore.acceptOrders ? '接单中' : '休息中' }}
                 </span>
                 <n-switch
                   :value="userStore.acceptOrders"
@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, h } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent,
@@ -95,16 +95,12 @@ const switchLoading = ref(false)
 const currentTitle = computed(() => (route.meta.title as string) || '维护')
 const currentMenuKey = computed(() => (route.name as string) || '')
 
-function renderIcon(label: string) {
-  return () => h('span', { style: 'font-size: 16px' }, label)
-}
-
 const menuOptions: MenuOption[] = [
-  { label: '今日待办', key: 'todo', icon: renderIcon('📋') },
-  { label: '看板', key: 'dashboard', icon: renderIcon('📊') },
-  { label: '公开池', key: 'pool', icon: renderIcon('🆕') },
-  { label: '我的玩家', key: 'leads', icon: renderIcon('👥') },
-  { label: '查询', key: 'search', icon: renderIcon('🔍') }
+  { label: '今日待办', key: 'todo' },
+  { label: '看板', key: 'dashboard' },
+  { label: '公开池', key: 'pool' },
+  { label: '我的玩家', key: 'leads' },
+  { label: '查询', key: 'search' }
 ]
 
 function handleMenuSelect(key: string) {
@@ -124,7 +120,7 @@ async function onToggleAccept(val: boolean) {
   }
 }
 
-// 登录态变 → WS 跟着变
+// 登录态变  WS 跟着变
 watch(
   () => userStore.token,
   (token) => {
@@ -145,7 +141,7 @@ onMounted(() => {
   }
 })
 
-// P12 实时事件 → 高额 / 重新激活弹窗
+// P12 实时事件  高额 / 重新激活弹窗
 watch(
   () => wsStore.lastMessage,
   (msg) => {
@@ -155,7 +151,7 @@ watch(
       // 高额订单:弹 n-notification + 跳详情可点
       notify.create({
         type: 'warning',
-        title: `💰 高额订单 ¥${data.amount}`,
+        title: `高额订单 ¥${data.amount}`,
         content: `${data.game_code || ''} 玩家 ${data.player_id} 充值 ¥${data.amount}` +
                  (data.claimed_by_name ? ` · 维护员 ${data.claimed_by_name}` : ' · 暂无人认领'),
         duration: 8000,
@@ -168,7 +164,7 @@ watch(
       // 玩家重新激活(从流失恢复)
       notify.create({
         type: 'success',
-        title: '🌱 玩家重新激活',
+        title: '玩家重新激活',
         content: `${data.game_code || ''} 玩家 ${data.player_id} 再次上线,已从流失状态恢复` +
                  (data.claimed_by_name ? ` · 维护员 ${data.claimed_by_name}` : ''),
         duration: 6000,

@@ -31,7 +31,7 @@
     <!-- 动作分布 TOP + 用户 TOP -->
     <n-grid :cols="2" :x-gap="16" :y-gap="12" style="margin-bottom: 16px">
       <n-gi>
-        <n-card title="📊 动作分布(近 7 天)" size="small">
+        <n-card title="动作分布(近 7 天)" size="small">
           <div v-if="byAction.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="row in byAction" :key="row.action" style="margin-bottom: 8px">
@@ -45,7 +45,7 @@
         </n-card>
       </n-gi>
       <n-gi>
-        <n-card title="👤 活跃用户(近 7 天 TOP 10)" size="small">
+        <n-card title="活跃用户(近 7 天 TOP 10)" size="small">
           <div v-if="byUser.length === 0" class="text-muted">暂无数据</div>
           <div v-else>
             <div v-for="(row, idx) in byUser" :key="row.username" style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f5f5f5">
@@ -161,7 +161,7 @@ const columns: DataTableColumns<any> = [
   { title: 'IP', key: 'ip', width: 120 },
   {
     title: '状态', key: 'status', width: 80,
-    render: (r) => h(NTag, { size: 'small', type: r.status === 'success' ? 'success' : 'error' }, () => r.status === 'success' ? '✓' : '✗')
+    render: (r) => h(NTag, { size: 'small', type: r.status === 'success' ? 'success' : 'error' }, () => r.status === 'success' ? '' : '')
   },
   {
     title: '详情', key: 'details', width: 80,

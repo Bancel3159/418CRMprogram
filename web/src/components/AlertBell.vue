@@ -9,7 +9,7 @@
     <template #trigger>
       <div class="alert-bell" @click="openPopover">
         <n-badge :value="unreadCount" :max="99" :show="unreadCount > 0" :offset="[-4, 4]">
-          <span style="font-size: 20px">🔔</span>
+          <span style="font-size: 20px"></span>
         </n-badge>
       </div>
     </template>
@@ -33,9 +33,9 @@
           @click="onAlertClick(a)"
         >
           <div class="alert-icon">
-            <span v-if="a.level === 'critical'">🚨</span>
-            <span v-else-if="a.level === 'warning'">⚠️</span>
-            <span v-else>ℹ️</span>
+            <span v-if="a.level === 'critical'"></span>
+            <span v-else-if="a.level === 'warning'"></span>
+            <span v-else></span>
           </div>
           <div class="alert-body">
             <div class="alert-title">{{ a.title }}</div>

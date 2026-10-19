@@ -33,7 +33,7 @@
 
     <n-grid :cols="2" :x-gap="16" :y-gap="12">
       <n-gi>
-        <n-card title="📦 数据表行数统计" size="small">
+        <n-card title="数据表行数统计" size="small">
           <div v-if="tableStats.length === 0" class="text-muted">加载中…</div>
           <div v-else>
             <div v-for="t in tableStats" :key="t.table" style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px">
@@ -44,7 +44,7 @@
         </n-card>
       </n-gi>
       <n-gi>
-        <n-card title="⚙️ 运行时配置(follow + realtime)" size="small">
+        <n-card title="运行时配置(follow + realtime)" size="small">
           <n-spin :show="loadingCfg">
             <div style="font-size: 13px; line-height: 2">
               <div v-for="row in cfgRows" :key="row.key" style="display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #f5f5f5">

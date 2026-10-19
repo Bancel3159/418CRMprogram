@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-header">
-      <span style="font-size: 18px; font-weight: 700">📋 今日待办</span>
+      <span style="font-size: 18px; font-weight: 700">今日待办</span>
       <n-space align="center">
         <n-select v-model:value="statusFilter" :options="statusOptions" style="width: 110px" @update:value="loadList" />
         <n-button @click="loadList" :loading="loading">刷新</n-button>
@@ -48,20 +48,15 @@
         style="margin-bottom: 12px"
       >
         <div style="display: flex; align-items: center; gap: 12px">
-          <!-- 类型图标 -->
-          <div :class="['priority-icon', priorityBg(r.priority)]">
-            {{ typeIcon(r.remind_type) }}
-          </div>
-
           <!-- 主体 -->
           <div style="flex: 1">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px">
               <n-tag :type="typeTagType(r.remind_type)" size="small">{{ typeLabel(r.remind_type) }}</n-tag>
-              <n-tag v-if="r.priority === 2" type="error" size="small">🔥 高优先级</n-tag>
-              <n-tag v-else-if="r.priority === 1" type="warning" size="small">⚡ 中优先级</n-tag>
-              <n-tag v-if="r.status === 'done'" type="success" size="small">✓ 已完成</n-tag>
+              <n-tag v-if="r.priority === 2" type="error" size="small">高优先级</n-tag>
+              <n-tag v-else-if="r.priority === 1" type="warning" size="small">中优先级</n-tag>
+              <n-tag v-if="r.status === 'done'" type="success" size="small">已完成</n-tag>
               <n-tag v-else-if="r.status === 'expired'" type="default" size="small">已过期</n-tag>
-              <n-tag v-if="r.lead?.is_lost" type="error" size="small">⚠️ 已流失</n-tag>
+              <n-tag v-if="r.lead?.is_lost" type="error" size="small">已流失</n-tag>
               <span v-if="r.note" style="font-size: 12px; color: #6b7280">{{ r.note }}</span>
             </div>
 
@@ -77,7 +72,7 @@
               <span v-if="r.lead?.claimed_by_name">
                 认领人:{{ r.lead.claimed_by_name }}
               </span>
-              <span v-if="r.lead?.is_paid" style="color: #059669; margin-left: 8px">💰 已付费</span>
+              <span v-if="r.lead?.is_paid" style="color: #059669; margin-left: 8px">已付费</span>
             </div>
           </div>
 
@@ -89,7 +84,7 @@
               size="small"
               @click="goFollow(r.lead_id)"
             >
-              ✍️ 去跟进
+               去跟进
             </n-button>
             <n-button v-else size="small" quaternary @click="goFollow(r.lead_id)">查看</n-button>
           </n-space>
@@ -154,26 +149,18 @@ function goFollow(leadId: number) {
   router.push(`/leads/${leadId}`)
 }
 
-const TYPE_LABELS: Record<string, { label: string; icon: string; tagType: string }> = {
-  follow_new_register: { label: '新注册跟进', icon: '🆕', tagType: 'info' },
-  follow_paid_daily: { label: '付费每日跟进', icon: '💎', tagType: 'success' },
-  follow_paid_offline: { label: '付费离线', icon: '⏰', tagType: 'warning' },
-  lost_check: { label: '流失检查', icon: '⚠️', tagType: 'error' }
+const TYPE_LABELS: Record<string, { label: string; tagType: string }> = {
+  follow_new_register: { label: '新注册跟进', tagType: 'info' },
+  follow_paid_daily: { label: '付费每日跟进', tagType: 'success' },
+  follow_paid_offline: { label: '付费离线', tagType: 'warning' },
+  lost_check: { label: '流失检查', tagType: 'error' }
 }
 
 function typeLabel(t: string) {
   return TYPE_LABELS[t]?.label || t
 }
-function typeIcon(t: string) {
-  return TYPE_LABELS[t]?.icon || '📌'
-}
 function typeTagType(t: string) {
   return TYPE_LABELS[t]?.tagType || 'default'
-}
-function priorityBg(p: number) {
-  if (p === 2) return 'priority-high'
-  if (p === 1) return 'priority-medium'
-  return 'priority-normal'
 }
 function priorityClass(p: number, status: string) {
   if (status === 'done') return 'done'
@@ -219,17 +206,4 @@ onMounted(async () => {
   border-left: 4px solid #f59e0b;
   background: linear-gradient(to right, #fffbeb 0%, white 10%);
 }
-.priority-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-.priority-normal { background: #f3f4f6; }
-.priority-medium { background: #fef3c7; }
-.priority-high { background: #fee2e2; }
 </style>

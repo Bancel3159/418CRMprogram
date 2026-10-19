@@ -163,7 +163,7 @@ const columns: DataTableColumns<any> = [
   },
   {
     title: '启用', key: 'enabled', width: 70,
-    render: (r) => h(NTag, { size: 'small', type: r.enabled ? 'success' : 'default' }, () => r.enabled ? '✓' : '✗')
+    render: (r) => h(NTag, { size: 'small', type: r.enabled ? 'success' : 'default' }, () => r.enabled ? '' : '')
   },
   { title: '占位提示', key: 'placeholder', ellipsis: { tooltip: true } },
   {

@@ -23,7 +23,7 @@
     <n-grid :cols="2" :x-gap="16" responsive="screen">
       <!-- 左侧：已配置字段（可拖排序）-->
       <n-gi span="1 m:1">
-        <n-card size="small" :bordered="false" title="已配置字段（点击 ↑↓ 排序；点 ✎ 编辑；点 ✕ 移除）">
+        <n-card size="small" :bordered="false" title="已配置字段（点击  排序；点  编辑；点  移除）">
           <n-data-table
             :columns="configuredColumns"
             :data="configuredFields"
@@ -220,8 +220,8 @@ const configuredColumns = computed<DataTableColumns<ListViewField>>(() => [
     key: '__sort',
     width: 90,
     render: (_r, idx) => h(NSpace, { size: 4 }, () => [
-      h(NButton, { size: 'tiny', disabled: idx === 0, onClick: () => move(idx, -1) }, () => '↑'),
-      h(NButton, { size: 'tiny', disabled: idx === configuredFields.value.length - 1, onClick: () => move(idx, 1) }, () => '↓')
+      h(NButton, { size: 'tiny', disabled: idx === 0, onClick: () => move(idx, -1) }, () => ''),
+      h(NButton, { size: 'tiny', disabled: idx === configuredFields.value.length - 1, onClick: () => move(idx, 1) }, () => '')
     ])
   },
   { title: '显示名', key: 'label', width: 120, ellipsis: { tooltip: true } },
@@ -234,8 +234,8 @@ const configuredColumns = computed<DataTableColumns<ListViewField>>(() => [
     width: 110,
     fixed: 'right',
     render: (r, idx) => h(NSpace, { size: 4 }, () => [
-      h(NButton, { size: 'tiny', type: 'primary', onClick: () => openEdit(r, idx) }, () => '✎'),
-      h(NButton, { size: 'tiny', type: 'error', onClick: () => remove(idx) }, () => '✕')
+      h(NButton, { size: 'tiny', type: 'primary', onClick: () => openEdit(r, idx) }, () => ''),
+      h(NButton, { size: 'tiny', type: 'error', onClick: () => remove(idx) }, () => '')
     ])
   }
 ])

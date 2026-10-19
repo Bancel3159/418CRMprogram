@@ -14,7 +14,7 @@
         <template #default>
           <div style="font-size: 12px; line-height: 1.6">
             本操作<b>绕过常规业务校验</b>,可修改归属(游戏/拉新员/维护员)、状态机、付费标记、流失状态等。
-            所有改动会写入<b>操作审计</b>(系统管理 → 操作审计),含 before/after 全量快照。
+            所有改动会写入<b>操作审计</b>(系统管理  操作审计),含 before/after 全量快照。
           </div>
         </template>
       </n-alert>
@@ -413,7 +413,7 @@ function buildPayload(): any {
   const has = changedFields.value
   for (const k of has) {
     if (k.endsWith('_at')) {
-      // 时间字段:表单 timestamp → ISO
+      // 时间字段:表单 timestamp  ISO
       const ts = form[k + '_ts']
       p[k] = ts ? new Date(ts).toISOString() : null
     } else {

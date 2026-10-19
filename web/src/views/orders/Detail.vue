@@ -2,7 +2,7 @@
   <div>
     <div class="page-header">
       <div class="page-title">订单详情 #{{ order.id }}</div>
-      <n-button @click="$router.back()">← 返回</n-button>
+      <n-button @click="$router.back()">返回</n-button>
     </div>
 
     <n-spin :show="loading">
@@ -50,7 +50,7 @@
 
           <!-- 人工绑定 -->
           <n-card v-if="order.attribution_status === 'pending_attribution'" title="人工绑定 Lead" style="margin-top: 16px; border: 2px solid #f0a020">
-            <p style="color: #f0a020">⚠️ 该订单未自动归属,请从下方候选列表中选择一个 Lead 完成绑定,或手动指定 lead ID。</p>
+            <p style="color: #f0a020">该订单未自动归属,请从下方候选列表中选择一个 Lead 完成绑定,或手动指定 lead ID。</p>
             <n-space vertical>
               <n-input v-model:value="manualLeadId" placeholder="候选 lead ID,或手动输入" type="number" />
               <n-button type="primary" :loading="binding" @click="doBind">绑定</n-button>
